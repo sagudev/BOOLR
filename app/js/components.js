@@ -2972,7 +2972,7 @@ class DisplayDecoder extends Component {
     }
 }
 
-class ROM extends Component {
+/* class ROM extends Component {
     constructor(name,pos,data=[]) {
         super(name,pos,3,8,{ type: "char", text: "ROM" });
 
@@ -3034,7 +3034,7 @@ class ROM extends Component {
             }
         }
     }
-}
+} */
 
 class RAM extends Component {
     constructor(name,pos,data=[]) {
@@ -3062,9 +3062,9 @@ class RAM extends Component {
         for (let i = 0; i < dataWidth; ++i) {
             this.addInputPort({ side: 3, pos: i + addressWidth }, "I" + i);
         }
-        this.writeEnable = this.addInputPort({ side: 2, pos: addressWidth + dataWidth + 0 }, "WE");
-        this.readEnable = this.addInputPort({ side: 2, pos: addressWidth + dataWidth + 1 }, "RE");
-        this.clock = this.addInputPort({ side: 2, pos: addressWidth + dataWidth + 2 }, "Clock");
+        this.writeEnable = this.addInputPort({ side: 0, pos: 0 }, "WE");
+        this.readEnable = this.addInputPort({ side: 0, pos: 1 }, "RE");
+        this.clock = this.addInputPort({ side: 0, pos: 2 }, "Clock");
         
         this.output = [];
         for(let i = 0; i < dataWidth; ++i) {
