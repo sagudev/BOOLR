@@ -42,7 +42,7 @@ c.onkeydown = function(e) {
         case 13: // Enter
             break;
         case 27: // Escape
-            document.getElementById("list").style.display = "none";
+            hideLists();
             contextMenu.hide();
             waypointsMenu.hide();
             selecting = null;
