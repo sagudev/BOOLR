@@ -351,7 +351,7 @@ c.onmousedown = function(e) {
                     });
                 } else if(found = findPortByPos()) {
                     const port = found;
-                    if(port.type == "output") {
+                    if(port.type == "output" || port.type == "io") {
                         connecting = new Wire();
                         connecting.from = port;
                         connecting.pos.push({

@@ -1827,6 +1827,23 @@ class Component {
         return port;
     }
 
+    addIOPort(pos,name,properties = {}) {
+        const port = {
+            id: generateId(),
+            type: "io",
+            component: this,
+            name,
+            pos,
+            value: 0
+        }
+
+        Object.assign(port,properties);
+
+        this.input.push(port);
+        this.output.push(port);
+        return port;
+    }
+
     rotate() {
         // TODO: solution for input/output
         for(let i = 0; i < this.input.length; ++i) {
@@ -1940,6 +1957,45 @@ class TimerStart extends Component {
         this.output[0].value = this.value;
     }
 }
+
+class HalfAdder extends Component {
+        constructor(name,pos) {
+            super(name,pos,4,2,{ type: "char", text: "HalfAdder" });
+            this.addInputPort({ side: 3, pos: 0 }, "A");
+            this.addInputPort({ side: 3, pos: 1 }, "B");
+            this.addOutputPort({ side: 1, pos: 0 }, "Sum");
+            this.addOutputPort({ side: 1, pos: 1 }, "Carry");
+    
+        }
+
+        function() {
+            this.output[0].value = this.input[0].value ^ this.input[1].value;
+            this.output[1].value = this.input[0].value & this.input[1].value;
+        }
+    }
+    
+    class FullAdder extends Component {
+        constructor(name,pos) {
+            super(name,pos,4,3,{ type: "char", text: "FullAdder" });
+            this.addInputPort({ side: 3, pos: 0 }, "A");
+            this.addInputPort({ side: 3, pos: 1 }, "B");
+            this.addInputPort({ side: 3, pos: 2 }, "C");
+            this.addOutputPort({ side: 1, pos: 0 }, "Sum");
+            this.addOutputPort({ side: 1, pos: 1 }, "Carry");
+            
+        }
+
+        function() {
+            let sum1 = this.input[1].value ^ this.input[2].value;
+            let carry1 = this.input[1].value & this.input[2].value;
+
+            let sum2 = this.input[0].value ^ sum1;
+            let carry2 = this.input[0].value & sum1;
+
+            this.output[0].value = sum2;
+            this.output[1].value = carry1 | carry2;
+        }
+    }
 
 class TimerEnd extends Component {
     constructor(name,pos) {
