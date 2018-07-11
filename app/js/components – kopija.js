@@ -2972,7 +2972,7 @@ class DisplayDecoder extends Component {
     }
 }
 
-/* class ROM extends Component {
+class ROM extends Component {
     constructor(name,pos,data=[]) {
         super(name,pos,3,8,{ type: "char", text: "ROM" });
 
@@ -3034,7 +3034,7 @@ class DisplayDecoder extends Component {
             }
         }
     }
-} */
+}
 
 class RAM extends Component {
     constructor(name,pos,data=[]) {
@@ -3060,15 +3060,15 @@ class RAM extends Component {
             this.addInputPort({ side: 3, pos: i }, "A" + i);
         }
         for (let i = 0; i < dataWidth; ++i) {
-            this.addInputPort({ side: 3, pos: i + addressWidth }, "I" + i);
+            this.addInputPort({ side: 3, pos: i + addressWidth }, "D" + i);
         }
-        this.writeEnable = this.addInputPort({ side: 0, pos: 0 }, "WE");
-        this.readEnable = this.addInputPort({ side: 0, pos: 1 }, "RE");
-        this.clock = this.addInputPort({ side: 0, pos: 2 }, "Clock");
+        this.writeEnable = this.addInputPort({ side: 3, pos: addressWidth + dataWidth + 0 }, "WE");
+        this.readEnable = this.addInputPort({ side: 3, pos: addressWidth + dataWidth + 1 }, "RE");
+        this.clock = this.addInputPort({ side: 3, pos: addressWidth + dataWidth + 2 }, "Clock");
         
         this.output = [];
         for(let i = 0; i < dataWidth; ++i) {
-            this.addOutputPort({ side: 1, pos: i }, "O" + i);
+            this.addOutputPort({ side: 1, pos: i }, "D" + i);
         }
         
         this.data = []; //We don't want to save the data
@@ -3093,12 +3093,12 @@ class RAM extends Component {
                 for (let i = 0; i < this.output.length; i++) {
                     this.output[i].value = (content & (1 << i)) > 0 ? 1 : 0;
                 }
-            } else {
+            }else{
                 for (let i = 0; i < this.output.length; i++) {
                     this.output[i].value = 0;
                 }
             }
-        } else {
+        }else{
             for (let i = 0; i < this.output.length; i++) {
                 this.output[i].value = 0;
             }
@@ -3115,7 +3115,8 @@ class MUX extends Component {
             }
         }, 100);
     }
-
+    
+    
     create() {
         if(!this.properties.hasOwnProperty("selectionWidth")) {
             return
@@ -3127,8 +3128,9 @@ class MUX extends Component {
         this.width = selectionWidth;
                 
         this.input = [];  
-        for(let i = 0; i < dataWidth; ++i) {
-            this.addInputPort({ side: 3, pos: i }, "D" + i);
+        for(let i = 0; i < dataWidth * totalSelections; ++i) {
+            let pack = Math.floor(i / dataWidth);
+            this.addInputPort({ side: 3, pos: i }, "D" + (i % dataWidth) + " " + pack);
         }
         for (let i = 0; i < selectionWidth; ++i) {
             this.addInputPort({ side: 2, pos: i }, "S" + i);
@@ -3136,9 +3138,9 @@ class MUX extends Component {
 
         this.output = [];
         
-
-        this.addOutputPort({ side: 1, pos: 0 }, "O" + 0);
-
+        for (let i = 0; i < dataWidth; ++i) {
+            this.addOutputPort({ side: 1, pos: i }, "O" + i);
+        }
         this.function();
     }
     
@@ -3149,12 +3151,12 @@ class MUX extends Component {
         let selected = 0;
         
         for (let i = 0; i < selectionWidth; i++) {
-            selected = selected + this.input[dataWidth + i].value * (i + 1);
+            selected |= this.input[dataWidth * totalSelections + i].value > 0 ? 1 << i : 0;
         }
 
-
-        this.output[0].value = this.input[selected].value;
-
+        for (let i = 0; i < dataWidth; i++) {
+            this.output[i].value = this.input[dataWidth * selected + i].value;
+        }
     }
 }
 
@@ -3180,17 +3182,18 @@ class DEMUX extends Component {
         this.width = selectionWidth > 3 ? selectionWidth : 3;
                 
         this.input = [];  
-
+        for (let i = 0; i < dataWidth; ++i) {
+            this.addInputPort({ side: 3, pos: i }, "D" + i);
+        }
         for (let i = 0; i < selectionWidth; ++i) {
             this.addInputPort({ side: 2, pos: i }, "S" + i);
         }
-        this.addInputPort({ side: 3, pos: 0 }, "Z" + 0);
 
         this.output = [];
-        for (let i = 0; i < dataWidth; ++i) {
-            this.addOutputPort({ side: 1, pos: i }, "D" + i);
+        for(let i = 0; i < dataWidth * totalSelections; ++i) {
+            let pack = Math.floor(i / dataWidth);
+            this.addOutputPort({ side: 1, pos: i }, "O" + (i % dataWidth) + " " + pack);
         }
-
         this.function();
     }
     
@@ -3201,107 +3204,13 @@ class DEMUX extends Component {
         let selected = 0;
         
         for (let i = 0; i < selectionWidth; i++) {
-            selected = selected + this.input[i].value * (i + 1);
+            selected |= this.input[dataWidth + i].value > 0 ? 1 << i : 0;
         }
-        this.output[selected].value = this.input[selectionWidth].value;
 
-    }
-}
-
-class FF extends Component {
-    constructor(name,pos,data=[]) {
-        super(name,pos,3,2,{ type: "char", text: "FF" }); 
-        this.input = [];  
-        this.addInputPort({ side: 3, pos: 0 }, "D");
-        this.addInputPort({ side: 3, pos: 1 }, "Clk");
-        this.output = [];
-        this.addOutputPort({ side: 1, pos: 0 }, "Q");
-        this.addOutputPort({ side: 1, pos: 1 }, "-Q");
-
-        //this.function();
-    }
-    
-    function() {
-        if (this.input[1].value) {
-            if (this.input[0].value) {
-                this.output[0].value = 1;
-            } else {
-                this.output[0].value = 0;
+        for (let i = 0; i < totalSelections; i++) {
+            for (let j = 0; j < dataWidth; j++) {
+                this.output[dataWidth * i + j].value = i == selected ? this.input[j].value : 0;
             }
-        }
-        if (this.output[0].value) {
-            this.output[1].value = 0;
-        } else {
-            this.output[1].value = 1;
-        }
-    }
-}
-
-class RS extends Component {
-    constructor(name,pos,data=[]) {
-        super(name,pos,3,2,{ type: "char", text: "RS" }); 
-        this.input = [];  
-        this.addInputPort({ side: 3, pos: 0 }, "S");
-        this.addInputPort({ side: 3, pos: 1 }, "R");
-        this.output = [];
-        this.addOutputPort({ side: 1, pos: 0 }, "Q");
-        this.addOutputPort({ side: 1, pos: 1 }, "-Q");
-
-        //this.function();
-    }
-    
-    function() {
-        /* if (this.input[1].value) {
-            if (this.input[0].value) {
-                this.output[0].value = 1;
-            } else {
-                this.output[0].value = 0;
-            }
-        }
-        if (this.output[0].value) {
-            this.output[1].value = 0;
-        } else {
-            this.output[1].value = 1;
-        } */
-        if (this.input[1].value) {
-            this.output[0].value = 0;
-        } else if (this.input[0].value) {
-            this.output[0].value = 1;
-        }
-        if (this.output[0].value) {
-            this.output[1].value = 0;
-        } else {
-            this.output[1].value = 1;
-        }
-    }
-}
-
-class JK extends Component {
-    constructor(name,pos,data=[]) {
-        super(name,pos,4,3,{ type: "char", text: "JK" }); 
-        this.input = [];  
-        this.addInputPort({ side: 3, pos: 0 }, "J");
-        this.addInputPort({ side: 3, pos: 1 }, "Clk");
-        this.addInputPort({ side: 3, pos: 2 }, "K");
-        this.output = [];
-        this.addOutputPort({ side: 1, pos: 0 }, "Q");
-        this.addOutputPort({ side: 1, pos: 2 }, "-Q");
-
-        //this.function();
-    }
-    
-    function() {
-        if (this.input[1].value) {
-            if (this.input[0].value) {
-                this.output[0].value = 1;
-            } else if (this.input[1].value) {
-                this.output[0].value = 0;
-            }
-        }
-        if (this.output[0].value) {
-            this.output[1].value = 0;
-        } else {
-            this.output[1].value = 1;
         }
     }
 }
