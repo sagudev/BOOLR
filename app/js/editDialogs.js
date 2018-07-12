@@ -437,9 +437,9 @@
             component.properties, "addressWidth", component.properties.addressWidth || "4",
             function(addressWidth) {
                 let value = parseVariableInput(addressWidth)
-                return !isNaN(value) && 1 <= value && value <= 24;
+                return !isNaN(value) && 1 <= value;
             },
-            "Address width must be 1 <= x <= 24",
+            "Address width must be 1 <= x",
             function() {
                 component.properties.addressWidth = parseVariableInput(this.value);
                 createVariableReference(this.value,component,["properties","addressWidth"]);
@@ -506,19 +506,19 @@
         dialog.container.innerHTML += `<p>Enter widths for component <i>${component.name}</i></p>`;
 
         const selectionWidthInput = createInput(
-            component.properties, "selectionWidth", component.properties.selectionWidth || "4",
+            component.properties, "selectionWidth", component.properties.selectionWidth || "2",
             function(selectionWidth) {
                 let value = parseVariableInput(selectionWidth)
                 let dataWidth = component.properties.dataWidth || "4";
-                return !isNaN(value) && 1 <= value && value <= 24 && (dataWidth * Math.pow(2, selectionWidth)) <= 64;
+                return !isNaN(value) && 1 <= value && Math.pow(2, selectionWidth) <= dataWidth;
             },
-            "Selection width must be 1 <= x <= 24 and (data width * 2 ^ selection width) <= 64",
+            "Selection width must be 1 <= x and 2 ^ selection width <= data width",
             function() {
                 component.properties.selectionWidth = parseVariableInput(this.value);
                 createVariableReference(this.value,component,["properties","selectionWidth"]);
             }
         );
-        const dataWidthInput = createSelect(
+        /* const dataWidthInput = createSelect(
             component.properties, "dataWidth", component.properties.dataWidth || 4,
             [{"value": 4, "text": "4"},
              {"value": 8, "text": "8"},
@@ -526,6 +526,19 @@
              {"value": 32, "text": "32"}],
             function() {
                 component.properties.dataWidth = +this.value;
+            }
+        ); */
+        const dataWidthInput = createInput(
+            component.properties, "dataWidth", component.properties.dataWidth || "4",
+            function(dataWidth) {
+                let value = parseVariableInput(dataWidth)
+                //let dataWidth = component.properties.dataWidth || "4";
+                return !isNaN(value) && 1 <= value;
+            },
+            "Data width must be 1 <= x",
+            function() {
+                component.properties.dataWidth = parseVariableInput(this.value);
+                createVariableReference(this.value,component,["properties","dataWidth"]);
             }
         );
         setTimeout(() => selectionWidthInput.focus(),10);
@@ -576,29 +589,32 @@
         dialog.show();
         dialog.name.innerHTML = "Edit DEMUX";
         dialog.container.innerHTML += "<i class='material-icons' style='font-size: 60px'>demultiplexer<i>";
-        dialog.container.innerHTML += `<p>Enter widths for component <i>${component.name}</i></p>`;
+        dialog.container.innerHTML += `<p>Enter widths for component <i>${component.name}</i> and do not forget that 2 ^ selection width <= data width</p>`;
 
         const selectionWidthInput = createInput(
             component.properties, "selectionWidth", component.properties.selectionWidth || "4",
             function(selectionWidth) {
                 let value = parseVariableInput(selectionWidth)
-                let dataWidth = component.properties.dataWidth || "4";
-                return !isNaN(value) && 1 <= value && value <= 24 && (dataWidth * Math.pow(2, selectionWidth)) <= 64;
+                let dataWidth = component.properties.dataWidth || "16";
+                return !isNaN(value) && 1 <= value;
             },
-            "Selection width must be 1 <= x <= 24 and (data width * 2 ^ selection width) <= 64",
+            "Selection width must be 1 <= x",
             function() {
                 component.properties.selectionWidth = parseVariableInput(this.value);
                 createVariableReference(this.value,component,["properties","selectionWidth"]);
             }
         );
-        const dataWidthInput = createSelect(
-            component.properties, "dataWidth", component.properties.dataWidth || 4,
-            [{"value": 4, "text": "4"},
-             {"value": 8, "text": "8"},
-             {"value": 16, "text": "16"},
-             {"value": 32, "text": "32"}],
+        const dataWidthInput = createInput(
+            component.properties, "dataWidth", component.properties.dataWidth || "16",
+            function(dataWidth) {
+                let value = parseVariableInput(dataWidth)
+                //let dataWidth = component.properties.dataWidth || "4";
+                return !isNaN(value) && 1 <= value;
+            },
+            "Data width must be 1 <= x",
             function() {
-                component.properties.dataWidth = +this.value;
+                component.properties.dataWidth = parseVariableInput(this.value);
+                createVariableReference(this.value,component,["properties","dataWidth"]);
             }
         );
         setTimeout(() => selectionWidthInput.focus(),10);
@@ -638,6 +654,121 @@
                 if (!dataWidthValid) {
                     dataWidthInput.className = "error";
                     error += dataWidthInput.errormsg + "<br>";
+                }
+                errormsg.show(error);
+                this.onmouseup = () => this.onmouseup = dialog.hide;
+            }
+        });
+    }
+    dialog.editC = function(component,callback) {
+        if(!component) return;
+        dialog.show();
+        dialog.name.innerHTML = "Edit C";
+        dialog.container.innerHTML += "<i class='material-icons' style='font-size: 60px'>demultiplexer<i>";
+        dialog.container.innerHTML += `<p>Enter widths for component <i>${component.name}</i></p>`;
+
+        const sWidthInput = createInput(
+            component.properties, "Width", component.properties.sWidth || "4",
+            function(sWidth) {
+                let value = parseVariableInput(sWidth)
+                return !isNaN(value) && 1 <= value;
+            },
+            "Selection width must be 1 <= x",
+            function() {
+                component.properties.sWidth = parseVariableInput(this.value);
+                createVariableReference(this.value,component,["properties","sWidth"]);
+            }
+        );
+
+        setTimeout(() => sWidthInput.focus(),10);
+        dialog.container.removeChild(dialog.container.children[dialog.container.children.length - 1]);
+
+        const errormsg = document.createElement("p");
+        errormsg.className = "errormsg";
+        errormsg.innerHTML = ".";
+        errormsg.hide = null;
+        errormsg.show = function(text) {
+            clearTimeout(this.hide);
+            this.innerHTML = text;
+            this.style.opacity = 1;
+            this.hide = setTimeout(() => this.style.opacity = 0, 2500);
+        }
+        dialog.container.appendChild(errormsg);
+
+        dialog.addOption("Cancel", function() {
+            if(!component.properties.sWidth && !component.properties.data) {
+                component.properties.sWidth = 0;
+                callback && callback();
+            }
+        });
+        dialog.addOption("OK",  function() {
+            let sWidthValid = sWidthInput.valid(sWidthInput.value);
+            if (sWidthValid) {
+                sWidthInput.apply();
+                callback && callback();
+            } else {
+                let error = "";
+                if (!sWidthValid) {
+                    sWidthInput.className = "error";
+                    error += sWidthInput.errormsg + "<br>";
+                }
+                errormsg.show(error);
+                this.onmouseup = () => this.onmouseup = dialog.hide;
+            }
+        });
+    }
+
+    dialog.editM = function(component,callback) {
+        if(!component) return;
+        dialog.show();
+        dialog.name.innerHTML = "Edit";
+        dialog.container.innerHTML += "<i class='material-icons' style='font-size: 60px'>demultiplexer<i>";
+        dialog.container.innerHTML += `<p>Enter widths for component <i>${component.name}</i></p>`;
+
+        const sWidthInput = createInput(
+            component.properties, "Width", component.properties.sWidth || "4",
+            function(sWidth) {
+                let value = parseVariableInput(sWidth)
+                return !isNaN(value) && 1 <= value;
+            },
+            "Width must be 1 <= x",
+            function() {
+                component.properties.sWidth = parseVariableInput(this.value);
+                createVariableReference(this.value,component,["properties","sWidth"]);
+            }
+        );
+
+        setTimeout(() => sWidthInput.focus(),10);
+        dialog.container.removeChild(dialog.container.children[dialog.container.children.length - 1]);
+
+        const errormsg = document.createElement("p");
+        errormsg.className = "errormsg";
+        errormsg.innerHTML = ".";
+        errormsg.hide = null;
+        errormsg.show = function(text) {
+            clearTimeout(this.hide);
+            this.innerHTML = text;
+            this.style.opacity = 1;
+            this.hide = setTimeout(() => this.style.opacity = 0, 2500);
+        }
+        dialog.container.appendChild(errormsg);
+
+        dialog.addOption("Cancel", function() {
+            if(!component.properties.sWidth && !component.properties.data) {
+                component.properties.sWidth = 0;
+                callback && callback();
+            }
+        });
+        dialog.addOption("OK",  function() {
+            let sWidthValid = sWidthInput.valid(sWidthInput.value);
+            if (sWidthValid) {
+                sWidthInput.apply();
+                callback && callback();
+            } else {
+                let error = "";
+                if (!sWidthValid) {
+                    sWidthInput.className = "error";
+                    error += sWidthInput.errormsg + "<br>";
                 }
                 errormsg.show(error);
                 this.onmouseup = () => this.onmouseup = dialog.hide;

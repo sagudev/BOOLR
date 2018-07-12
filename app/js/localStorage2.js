@@ -98,7 +98,7 @@ const constructors = {
     Button,Constant,Delay,Clock,Debug,
     Beep,Counter,LED,Display,
     Custom, TimerStart, TimerEnd,
-    DisplayDecoder, HalfAdder, FullAdder, ROM, RAM, MUX, DEMUX, FF, RS, JK,
+    DisplayDecoder, HalfAdder, FullAdder, ROM, RAM, MUX, DEMUX, T, C, FF, RS, JK,
 };
 
 /*

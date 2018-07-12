@@ -227,7 +227,9 @@
 
             <div class="slot" data-list="io" tooltip="Input and output ports">I/O</div>
             <div class="slot" data-list="misc" tooltip="Misc components">Misc</div>
+            <div class="slot" data-list="logic" tooltip="Logic">Logic</div>
             <div class="slot" data-list="debug" tooltip="Debug components">Debug</div>
+            <div class="slot" tooltip="Tranzistor" onmousedown="event.which == 3 ? dialog.truthTable(NOT) : select(T)">T</div>
             <div class="slot" tooltip="NOT gate" onmousedown="event.which == 3 ? dialog.truthTable(NOT) : select(NOT)">!</div>
             <div class="slot" tooltip="AND gate" onmousedown="event.which == 3 ? dialog.truthTable(AND) : select(AND)">&</div>
             <div class="slot" tooltip="OR gate" onmousedown="event.which == 3 ? dialog.truthTable(OR) : select(OR)">|</div>
@@ -256,12 +258,21 @@
                 <li onclick="select(ROM)">ROM</li>
                 <li onclick="select(MUX)">MUX</li>
                 <li onclick="select(DEMUX)">DEMUX</li>
+                <li onclick="select(T)">T</li>
+                <li onclick="select(C)">C</li>
 				<li onclick="select(FF)">FF</li>
 				<li onclick="select(RS)">RS</li>
 				<li onclick="select(JK)">JK</li>
             </ul>
 
-            <ul id="debug" class="list" tabindex="3" style="display: none">
+            <ul id="logic" class="list" tabindex="3" style="display: none">
+                <li onclick="select(NOTM)">NOT</li>
+                <li onclick="select(ANDM)">AND</li>
+                <li onclick="select(ORM)">OR</li>
+                <li onclick="select(TM)">T</li>
+            </ul>
+
+            <ul id="debug" class="list" tabindex="4" style="display: none">
                 <li onclick="select(Debug)">Debug</li>
                 <li onclick="select(TimerStart)">TimerStart</li>
                 <li onclick="select(TimerEnd)">TimerEnd</li>

@@ -1959,43 +1959,43 @@ class TimerStart extends Component {
 }
 
 class HalfAdder extends Component {
-        constructor(name,pos) {
-            super(name,pos,4,2,{ type: "char", text: "HalfAdder" });
-            this.addInputPort({ side: 3, pos: 0 }, "A");
-            this.addInputPort({ side: 3, pos: 1 }, "B");
-            this.addOutputPort({ side: 1, pos: 0 }, "Sum");
-            this.addOutputPort({ side: 1, pos: 1 }, "Carry");
-    
-        }
+    constructor(name,pos) {
+        super(name,pos,4,2,{ type: "char", text: "HalfAdder" });
+        this.addInputPort({ side: 3, pos: 0 }, "A");
+        this.addInputPort({ side: 3, pos: 1 }, "B");
+        this.addOutputPort({ side: 1, pos: 0 }, "Sum");
+        this.addOutputPort({ side: 1, pos: 1 }, "Carry");
 
-        function() {
-            this.output[0].value = this.input[0].value ^ this.input[1].value;
-            this.output[1].value = this.input[0].value & this.input[1].value;
-        }
     }
-    
-    class FullAdder extends Component {
-        constructor(name,pos) {
-            super(name,pos,4,3,{ type: "char", text: "FullAdder" });
-            this.addInputPort({ side: 3, pos: 0 }, "A");
-            this.addInputPort({ side: 3, pos: 1 }, "B");
-            this.addInputPort({ side: 3, pos: 2 }, "C");
-            this.addOutputPort({ side: 1, pos: 0 }, "Sum");
-            this.addOutputPort({ side: 1, pos: 1 }, "Carry");
-            
-        }
 
-        function() {
-            let sum1 = this.input[1].value ^ this.input[2].value;
-            let carry1 = this.input[1].value & this.input[2].value;
-
-            let sum2 = this.input[0].value ^ sum1;
-            let carry2 = this.input[0].value & sum1;
-
-            this.output[0].value = sum2;
-            this.output[1].value = carry1 | carry2;
-        }
+    function() {
+        this.output[0].value = this.input[0].value ^ this.input[1].value;
+        this.output[1].value = this.input[0].value & this.input[1].value;
     }
+}
+    
+class FullAdder extends Component {
+    constructor(name,pos) {
+        super(name,pos,4,3,{ type: "char", text: "FullAdder" });
+        this.addInputPort({ side: 3, pos: 0 }, "A");
+        this.addInputPort({ side: 3, pos: 1 }, "B");
+        this.addInputPort({ side: 3, pos: 2 }, "C");
+        this.addOutputPort({ side: 1, pos: 0 }, "Sum");
+        this.addOutputPort({ side: 1, pos: 1 }, "Carry");
+        
+    }
+
+    function() {
+        let sum1 = this.input[1].value ^ this.input[2].value;
+        let carry1 = this.input[1].value & this.input[2].value;
+
+        let sum2 = this.input[0].value ^ sum1;
+        let carry2 = this.input[0].value & sum1;
+
+        this.output[0].value = sum2;
+        this.output[1].value = carry1 | carry2;
+    }
+}
 
 class TimerEnd extends Component {
     constructor(name,pos) {
@@ -3028,7 +3028,7 @@ class DisplayDecoder extends Component {
     }
 }
 
-/* class ROM extends Component {
+class ROM extends Component {
     constructor(name,pos,data=[]) {
         super(name,pos,3,8,{ type: "char", text: "ROM" });
 
@@ -3090,7 +3090,7 @@ class DisplayDecoder extends Component {
             }
         }
     }
-} */
+}
 
 class RAM extends Component {
     constructor(name,pos,data=[]) {
@@ -3109,7 +3109,7 @@ class RAM extends Component {
         }
         let addressWidth = this.properties.addressWidth;
         let dataWidth = this.properties.dataWidth;
-        this.height = addressWidth + dataWidth + 3;
+        this.height = addressWidth + dataWidth;
                 
         this.input = [];  
         for (let i = 0; i < addressWidth; ++i) {
@@ -3162,6 +3162,75 @@ class RAM extends Component {
     }
 }
 
+/* class RAM extends Component {
+    constructor(name,pos,data=[]) {
+        super(name,pos,3,8,{ type: "char", text: "RAM" });
+        setTimeout(() => {
+            if(!this.properties.hasOwnProperty("addressWidth")) {
+                dialog.editRam(this, this.create.bind(this));
+            }
+        }, 100);
+    }
+    
+    
+    create() {
+        if(!this.properties.hasOwnProperty("addressWidth")) {
+            return
+        }
+        let addressWidth = this.properties.addressWidth;
+        let dataWidth = this.properties.dataWidth;
+        this.height = addressWidth + dataWidth + 3;
+                
+        this.input = [];  
+        for (let i = 0; i < addressWidth; ++i) {
+            this.addInputPort({ side: 3, pos: i }, "A" + i);
+        }
+        this.writeEnable = this.addInputPort({ side: 0, pos: 0 }, "WE");
+        this.readEnable = this.addInputPort({ side: 0, pos: 1 }, "RE");
+        this.clock = this.addInputPort({ side: 0, pos: 2 }, "Clock");
+
+        
+        this.output = [];
+        for (let i = 0; i < dataWidth; ++i) {
+            this.addIOPort({ side: 3, pos: i + addressWidth }, "IO" + i);
+        }
+
+        
+        this.data = []; //We don't want to save the data
+        this.function();
+    }
+    
+    function() {
+        let addr = 0;
+        for (let  i = 0; i < this.properties.addressWidth; i++) {
+            addr |= (this.input[i].value > 0) << i;
+        }
+        if (this.clock.value > 0) {
+            if (this.writeEnable.value > 0) {                
+                let val = 0;
+                for (let  i = 0; i < this.properties.dataWidth; i++) {
+                    val |= (this.input[i + this.properties.addressWidth + 3].value > 0) << i;
+                }
+                this.data[addr] = val;
+            }
+            if (this.readEnable.value > 0) {
+                let content = this.data[addr];
+                for (let i = 0; i < this.output.length; i++) {
+                    this.output[i].value = (content & (1 << i)) > 0 ? 1 : 0;
+                }
+            } else {
+                for (let i = 0; i < this.output.length; i++) {
+                    this.output[i].value = 0;
+                }
+            }
+        } else {
+            for (let i = 0; i < this.output.length; i++) {
+                this.output[i].value = 0;
+            }
+        }
+    }
+} */
+
 class MUX extends Component {
     constructor(name,pos,data=[]) {
         super(name,pos,8,8,{ type: "char", text: "Mux" });
@@ -3178,8 +3247,7 @@ class MUX extends Component {
         }
         let selectionWidth = this.properties.selectionWidth;
         let dataWidth = this.properties.dataWidth;
-        let totalSelections = Math.pow(2, selectionWidth);
-        this.height = dataWidth * totalSelections;
+        this.height = dataWidth;
         this.width = selectionWidth;
                 
         this.input = [];  
@@ -3201,7 +3269,6 @@ class MUX extends Component {
     function() {
         let dataWidth = this.properties.dataWidth;
         let selectionWidth = this.properties.selectionWidth;
-        let totalSelections = Math.pow(2, selectionWidth);
         let selected = 0;
         
         for (let i = 0; i < selectionWidth; i++) {
@@ -3231,9 +3298,8 @@ class DEMUX extends Component {
         }
         let selectionWidth = this.properties.selectionWidth;
         let dataWidth = this.properties.dataWidth;
-        let totalSelections = Math.pow(2, selectionWidth);
-        this.height = dataWidth * totalSelections + totalSelections - 1;
-        this.width = selectionWidth > 3 ? selectionWidth : 3;
+        this.height = dataWidth;
+        this.width = selectionWidth;
                 
         this.input = [];  
 
@@ -3253,13 +3319,19 @@ class DEMUX extends Component {
     function() {
         let dataWidth = this.properties.dataWidth;
         let selectionWidth = this.properties.selectionWidth;
-        let totalSelections = Math.pow(2, selectionWidth);
         let selected = 0;
         
         for (let i = 0; i < selectionWidth; i++) {
             selected = selected + this.input[i].value * (i + 1);
         }
-        this.output[selected].value = this.input[selectionWidth].value;
+        for (let i = 0; i < dataWidth; i++) {
+            if (i != selected) {
+                this.output[i].value = 0;
+            } else {
+                this.output[selected].value = this.input[selectionWidth].value;
+            }
+        }
+        
 
     }
 }
@@ -3289,6 +3361,272 @@ class FF extends Component {
             this.output[1].value = 0;
         } else {
             this.output[1].value = 1;
+        }
+    }
+}
+
+class T extends Component {
+    constructor(name,pos,data=[]) {
+        super(name,pos,1,1,{ type: "char", text: "T" }); 
+        this.input = [];  
+        this.addInputPort({ side: 3, pos: 0 }, "I");
+        this.addInputPort({ side: 2, pos: 0 }, "G");
+        this.output = [];
+        this.addOutputPort({ side: 1, pos: 0 }, "O");
+
+        //this.function();
+    }
+    
+    function() {
+        if (this.input[1].value) {
+            this.output[0].value = this.input[0].value;
+        }
+    }
+}
+/// -----------------------------------------------------------
+class NOTM extends Component {
+    /* constructor(name,pos) {
+        super(name,pos,1,1,{ type: "char", text: "!" });
+        this.addInputPort({ side: 3, pos: 0 });
+        this.addOutputPort({ side: 1, pos: 0 });
+        this.function = function() {
+            this.output[0].value = 1 - this.input[0].value;
+        }
+    } */
+    constructor(name,pos,data=[]) {
+        super(name,pos,8,8,{ type: "char", text: "!" });
+        setTimeout(() => {
+            if(!this.properties.hasOwnProperty("sWidth")) {
+                dialog.editM(this, this.create.bind(this));
+            }
+        }, 100);
+    }
+    
+    
+    create() {
+        if(!this.properties.hasOwnProperty("sWidth")) {
+            return
+        }
+        let kol = this.properties.sWidth;
+        this.height = kol;
+        this.width = 1;
+                
+        this.input = [];  
+        for (let i = 0; i < kol; ++i) {
+            this.addInputPort({ side: 3, pos: i });
+        }
+        this.output = [];
+        for (let i = 0; i < kol; ++i) {
+            this.addOutputPort({ side: 1, pos: i });
+        }
+
+        this.function();
+    }
+    
+    function() {
+        let kol = this.properties.sWidth;
+        
+        for (let i = 0; i < kol; i++) {
+            this.output[i].value = 1 - this.input[i].value;
+        }
+    }
+}
+
+class ANDM extends Component {
+    /* constructor(name,pos) {
+        super(name,pos,2,2,{ type: "char", text: "&" });
+        this.addInputPort({ side: 3, pos: 1 });
+        this.addInputPort({ side: 3, pos: 0 });
+        this.addOutputPort({ side: 1, pos: 0 });
+        this.function = function() {
+            this.output[0].value = this.input[0].value & this.input[1].value;
+        }
+    } */
+    constructor(name,pos,data=[]) {
+        super(name,pos,8,8,{ type: "char", text: "&" });
+        setTimeout(() => {
+            if(!this.properties.hasOwnProperty("sWidth")) {
+                dialog.editM(this, this.create.bind(this));
+            }
+        }, 100);
+    }
+    
+    
+    create() {
+        if(!this.properties.hasOwnProperty("sWidth")) {
+            return
+        }
+        let kol = this.properties.sWidth;
+        this.height = kol;
+        this.width = 1;
+                
+        this.input = [];  
+        for (let i = 0; i < kol; ++i) {
+            this.addInputPort({ side: 3, pos: i });
+        }
+
+        this.output = [];
+        this.addOutputPort({ side: 1, pos: 0 });
+
+        this.function();
+    }
+    
+    function() {
+        let kol = this.properties.sWidth;
+        let hi = 1;
+        for (let i = 0; i < kol; i++) {
+            hi = hi & this.input[i].value;
+        }
+        this.output[0].value = hi;
+    }
+}
+
+class TM extends Component {
+    /* constructor(name,pos,data=[]) {
+        super(name,pos,1,1,{ type: "char", text: "T" }); 
+        this.input = [];  
+        this.addInputPort({ side: 3, pos: 0 }, "I");
+        this.addInputPort({ side: 2, pos: 0 }, "G");
+        this.output = [];
+        this.addOutputPort({ side: 1, pos: 0 }, "O");
+
+        //this.function();
+    }
+    
+    function() {
+        if (this.input[1].value) {
+            this.output[0].value = this.input[0].value;
+        }
+    } */
+    constructor(name,pos,data=[]) {
+        super(name,pos,8,8,{ type: "char", text: "Tm" });
+        setTimeout(() => {
+            if(!this.properties.hasOwnProperty("sWidth")) {
+                dialog.editM(this, this.create.bind(this));
+            }
+        }, 100);
+    }
+    
+    
+    create() {
+        if(!this.properties.hasOwnProperty("sWidth")) {
+            return
+        }
+        let kol = this.properties.sWidth;
+        this.height = kol;
+        this.width = 1;
+                
+        this.input = [];  
+        for (let i = 0; i < kol; ++i) {
+            this.addInputPort({ side: 3, pos: i }, "I" + i);
+        }
+        this.addInputPort({ side: 2, pos: kol }, "G");
+
+        this.output = [];
+        this.addOutputPort({ side: 1, pos: 0 });
+
+        this.function();
+    }
+    
+    function() {
+        let kol = this.properties.sWidth;
+        for (let i = 0; i < kol; i++) {
+            if (this.input[kol].value) {
+                this.output[i].value = this.input[i].value;
+            }
+        }
+    }
+}
+
+class ORM extends Component {
+    /* constructor(name,pos) {
+        super(name,pos,2,2,{ type: "char", text: "|" });
+        this.addInputPort({ side: 3, pos: 1 });
+        this.addInputPort({ side: 3, pos: 0 });
+        this.addOutputPort({ side: 1, pos: 0 });
+        this.function = function() {
+            this.output[0].value = this.input[0].value | this.input[1].value;
+        }
+    } */
+    constructor(name,pos,data=[]) {
+        super(name,pos,8,8,{ type: "char", text: "|" });
+        setTimeout(() => {
+            if(!this.properties.hasOwnProperty("sWidth")) {
+                dialog.editM(this, this.create.bind(this));
+            }
+        }, 100);
+    }
+    
+    
+    create() {
+        if(!this.properties.hasOwnProperty("sWidth")) {
+            return
+        }
+        let kol = this.properties.sWidth;
+        this.height = kol;
+        this.width = 1;
+                
+        this.input = [];  
+        for (let i = 0; i < kol; ++i) {
+            this.addInputPort({ side: 3, pos: i });
+        }
+
+        this.output = [];
+        this.addOutputPort({ side: 1, pos: 0 });
+
+        this.function();
+    }
+    
+    function() {
+        let kol = this.properties.sWidth;
+        let hi = 0;
+        for (let i = 0; i < kol; i++) {
+            hi = hi | this.input[i].value;
+        }
+        this.output[0].value = hi;
+    }
+}
+// --------------------------------------------------------------------------
+
+class C extends Component {
+    constructor(name,pos,data=[]) {
+        super(name,pos,8,1,{ type: "char", text: "C" });
+        setTimeout(() => {
+            if(!this.properties.hasOwnProperty("sWidth")) {
+                dialog.editC(this, this.create.bind(this));
+            }
+        }, 100);
+    }
+    
+    
+    create() {
+        if(!this.properties.hasOwnProperty("sWidth")) {
+            return
+        }
+        let sWidth = this.properties.sWidth;
+        this.height = sWidth + 1;
+                
+        this.input = [];  
+
+        for (let i = 0; i < sWidth; ++i) {
+            this.addInputPort({ side: 3, pos: i }, "D" + i);
+        }
+        this.addInputPort({ side: 3, pos: sWidth }, "Clk");
+
+        this.output = [];
+        for (let i = 0; i < sWidth; ++i) {
+            this.addOutputPort({ side: 1, pos: i }, "Q" + i);
+        }
+
+        this.function();
+    }
+    
+    function() {
+        let sWidth = this.properties.sWidth;
+        if (this.input[sWidth].value) {
+            for (let i = 0; i < sWidth; i++) {
+                this.output[i].value = this.input[i].value;
+            }
         }
     }
 }
