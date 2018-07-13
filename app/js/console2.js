@@ -220,7 +220,7 @@ function inputHandler(input) {
         case "?":
             boolrConsole.help();
             break;
-        case "openDevTools":
+        case "tool":
             require('electron').remote.getCurrentWindow().webContents.openDevTools();
             return "Opened Developer Tools";
             break;

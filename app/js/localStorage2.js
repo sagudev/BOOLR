@@ -97,6 +97,7 @@ const constructors = {
     Input,Output,NOT,AND,OR,XOR,
     Button,Constant,Delay,Clock,Debug,
     Beep,Counter,LED,Display,
+    NOTM, ANDM, TM, ORM,
     Custom, TimerStart, TimerEnd,
     DisplayDecoder, HalfAdder, FullAdder, ROM, RAM, MUX, DEMUX, T, C, FF, RS, JK,
 };

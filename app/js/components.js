@@ -3347,15 +3347,20 @@ class FF extends Component {
         this.addOutputPort({ side: 1, pos: 1 }, "-Q");
 
         //this.function();
-    }
+        this.lp = 0;
+    };
+    
     
     function() {
-        if (this.input[1].value) {
+        if (this.input[1].value && this.lp == 0) {
             if (this.input[0].value) {
                 this.output[0].value = 1;
             } else {
                 this.output[0].value = 0;
             }
+            this.lp = 1;
+        } else {
+            this.lp = 0;
         }
         if (this.output[0].value) {
             this.output[1].value = 0;
@@ -3375,11 +3380,15 @@ class T extends Component {
         this.addOutputPort({ side: 1, pos: 0 }, "O");
 
         //this.function();
+        
     }
     
     function() {
+
         if (this.input[1].value) {
             this.output[0].value = this.input[0].value;
+        } else {
+            this.output[0].value = 0;
         }
     }
 }
@@ -3520,10 +3529,13 @@ class TM extends Component {
         for (let i = 0; i < kol; ++i) {
             this.addInputPort({ side: 3, pos: i }, "I" + i);
         }
-        this.addInputPort({ side: 2, pos: kol }, "G");
+        this.addInputPort({ side: 2, pos: 0 }, "G");
 
         this.output = [];
-        this.addOutputPort({ side: 1, pos: 0 });
+        for (let i = 0; i < kol; ++i) {
+            this.addOutputPort({ side: 1, pos: i }, "O" + i);
+        }
+        //this.addOutputPort({ side: 1, pos: 0 });
 
         this.function();
     }
@@ -3533,6 +3545,8 @@ class TM extends Component {
         for (let i = 0; i < kol; i++) {
             if (this.input[kol].value) {
                 this.output[i].value = this.input[i].value;
+            } else {
+                this.output[i].value = 0;
             }
         }
     }
