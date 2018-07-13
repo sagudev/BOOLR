@@ -3272,7 +3272,7 @@ class MUX extends Component {
         let selected = 0;
         
         for (let i = 0; i < selectionWidth; i++) {
-            selected = selected + (2 * this.input[dataWidth + i].value) * (i + 1);
+            selected = selected + Math.pow(2, this.input[dataWidth + i].value * (i + 1));
         }
 
 
@@ -3323,7 +3323,7 @@ class DEMUX extends Component {
         
         for (let i = 0; i < selectionWidth; i++) {
             //selected = selected + this.input[i].value * (i + 1);
-            selected = selected + (2 * this.input[i].value) * (i + 1);
+            selected = selected + Math.pow(2, this.input[dataWidth + i].value * (i + 1));
         }
         for (let i = 0; i < dataWidth; i++) {
             if (i != selected) {
