@@ -258,18 +258,19 @@ function parse(data) {
         }
 
         const component = new constructors[constructor]();
-
+        //debugger;
         if(constructor == "Custom") {
             const parsed = parse(JSON.stringify(data.componentData));
             component.components = parsed.components;
             component.wires = parsed.wires;
             delete component.componentData;
+            //debugger;
         }
         
         objectWithoutProperties(data, ["input", "output"], component)
 
         component.create && component.create();
-
+        //debugger;
         const input = data.input;
         for(let i = 0; i < component.input.length; ++i) {
             component.input[i].name = input[i].name;

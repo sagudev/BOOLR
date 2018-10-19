@@ -3092,7 +3092,9 @@ class ROM extends Component {
     }
 }
 
-class RAM extends Component {
+
+
+class RAM extends Component { // nov
     constructor(name,pos,data=[]) {
         super(name,pos,3,8,{ type: "char", text: "RAM" });
         setTimeout(() => {
@@ -3109,7 +3111,9 @@ class RAM extends Component {
         }
         let addressWidth = this.properties.addressWidth;
         let dataWidth = this.properties.dataWidth;
-        this.height = addressWidth + dataWidth;
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = addressWidth + dataWidth;
+        }
                 
         this.input = [];  
         for (let i = 0; i < addressWidth; ++i) {
@@ -3118,9 +3122,9 @@ class RAM extends Component {
         for (let i = 0; i < dataWidth; ++i) {
             this.addInputPort({ side: 3, pos: i + addressWidth }, "I" + i);
         }
-        this.writeEnable = this.addInputPort({ side: 0, pos: 0 }, "WE");
-        this.readEnable = this.addInputPort({ side: 0, pos: 1 }, "RE");
-        this.clock = this.addInputPort({ side: 0, pos: 2 }, "Clock");
+        this.addInputPort({ side: 0, pos: 0 }, "WE");
+        this.addInputPort({ side: 0, pos: 1 }, "RE");
+        this.addInputPort({ side: 0, pos: 2 }, "Clock");
         
         this.output = [];
         for(let i = 0; i < dataWidth; ++i) {
@@ -3132,19 +3136,21 @@ class RAM extends Component {
     }
     
     function() {
+        let addressWidth = this.properties.addressWidth;
+        let dataWidth = this.properties.dataWidth;
         let addr = 0;
         for (let  i = 0; i < this.properties.addressWidth; i++) {
-            addr |= (this.input[i].value > 0) << i;
+            addr = addr + (Math.pow(2, i) * this.input[i].value);
         }
-        if (this.clock.value > 0) {
-            if (this.writeEnable.value > 0) {                
+        if (this.input[addressWidth + dataWidth + 2].value == 1) {
+            if (this.input[addressWidth + dataWidth].value == 1) {                
                 let val = 0;
                 for (let  i = 0; i < this.properties.dataWidth; i++) {
                     val |= (this.input[i + this.properties.addressWidth].value > 0) << i;
                 }
                 this.data[addr] = val;
             }
-            if (this.readEnable.value > 0) {
+            if (this.input[addressWidth + dataWidth + 1].value == 1) {
                 let content = this.data[addr];
                 for (let i = 0; i < this.output.length; i++) {
                     this.output[i].value = (content & (1 << i)) > 0 ? 1 : 0;
@@ -3247,8 +3253,10 @@ class MUX extends Component {
         }
         let selectionWidth = this.properties.selectionWidth;
         let dataWidth = this.properties.dataWidth;
-        this.height = dataWidth;
-        this.width = selectionWidth;
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = dataWidth;
+            this.width = selectionWidth;
+        }
                 
         this.input = [];  
         for(let i = 0; i < dataWidth; ++i) {
@@ -3272,7 +3280,9 @@ class MUX extends Component {
         let selected = 0;
         
         for (let i = 0; i < selectionWidth; i++) {
-            selected = selected + Math.pow(2, this.input[dataWidth + i].value * (i + 1));
+
+            selected = selected + (Math.pow(2, i) * this.input[i].value);
+
         }
 
 
@@ -3298,15 +3308,16 @@ class DEMUX extends Component {
         }
         let selectionWidth = this.properties.selectionWidth;
         let dataWidth = this.properties.dataWidth;
-        this.height = dataWidth;
-        this.width = selectionWidth;
-                
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = dataWidth;
+            this.width = selectionWidth;
+        }      
         this.input = [];  
 
         for (let i = 0; i < selectionWidth; ++i) {
             this.addInputPort({ side: 2, pos: i }, "S" + i);
         }
-        this.addInputPort({ side: 3, pos: 0 }, "Z" + 0);
+        this.addInputPort({ side: 3, pos: 0 }, "Z");
 
         this.output = [];
         for (let i = 0; i < dataWidth; ++i) {
@@ -3323,7 +3334,12 @@ class DEMUX extends Component {
         
         for (let i = 0; i < selectionWidth; i++) {
             //selected = selected + this.input[i].value * (i + 1);
-            selected = selected + Math.pow(2, this.input[dataWidth + i].value * (i + 1));
+
+            //selected = selected + this.input[i].value * (i + 1);
+            //selected |= this.input[dataWidth * totalSelections + i].value > 0 ? 1 << i : 0;
+            selected = selected + (Math.pow(2, i) * this.input[i].value);
+
+            
         }
         for (let i = 0; i < dataWidth; i++) {
             if (i != selected) {
@@ -3418,9 +3434,10 @@ class NOTM extends Component {
             return
         }
         let kol = this.properties.sWidth;
-        this.height = kol;
-        this.width = 1;
-                
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = kol;
+            this.width = 1;
+        }   
         this.input = [];  
         for (let i = 0; i < kol; ++i) {
             this.addInputPort({ side: 3, pos: i });
@@ -3455,6 +3472,7 @@ class ANDM extends Component {
     constructor(name,pos,data=[]) {
         super(name,pos,8,8,{ type: "char", text: "&" });
         setTimeout(() => {
+            debugger;
             if(!this.properties.hasOwnProperty("sWidth")) {
                 dialog.editM(this, this.create.bind(this));
             }
@@ -3466,10 +3484,14 @@ class ANDM extends Component {
         if(!this.properties.hasOwnProperty("sWidth")) {
             return
         }
+        debugger;
         let kol = this.properties.sWidth;
-        this.height = kol;
-        this.width = 1;
-                
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = kol;
+            this.width = 1;
+        }
+
+        debugger;
         this.input = [];  
         for (let i = 0; i < kol; ++i) {
             this.addInputPort({ side: 3, pos: i });
@@ -3477,7 +3499,7 @@ class ANDM extends Component {
 
         this.output = [];
         this.addOutputPort({ side: 1, pos: 0 });
-
+        debugger;
         this.function();
     }
     
@@ -3523,8 +3545,10 @@ class TM extends Component {
             return
         }
         let kol = this.properties.sWidth;
-        this.height = kol;
-        this.width = 1;
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = kol;
+            this.width = 1;
+        }
                 
         this.input = [];  
         for (let i = 0; i < kol; ++i) {
@@ -3578,8 +3602,10 @@ class ORM extends Component {
             return
         }
         let kol = this.properties.sWidth;
-        this.height = kol;
-        this.width = 1;
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = kol;
+            this.width = 1;
+        }
                 
         this.input = [];  
         for (let i = 0; i < kol; ++i) {
@@ -3605,7 +3631,7 @@ class ORM extends Component {
 
 class C extends Component {
     constructor(name,pos,data=[]) {
-        super(name,pos,8,1,{ type: "char", text: "C" });
+        super(name,pos,1,1,{ type: "char", text: "C" });
         setTimeout(() => {
             if(!this.properties.hasOwnProperty("sWidth")) {
                 dialog.editC(this, this.create.bind(this));
@@ -3619,7 +3645,9 @@ class C extends Component {
             return
         }
         let sWidth = this.properties.sWidth;
-        this.height = sWidth + 1;
+        if (this.rotation != 1 && this.rotation != 3) {
+            this.height = sWidth + 1;
+        }
                 
         this.input = [];  
 
