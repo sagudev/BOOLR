@@ -2,14 +2,7 @@
 A digital logic simulator  
 Download BOOLR: http://boolr.me
 
-#### Running in development
-
-Either npm or yarn can be used to fetch Electron as dependency and run scripts.
-
-```bash
-# Fetch dependencies
-npm install
-
-# Run in development
-npm start
-```
+## Diff from original.
+ - Liberated from nodejs and its npm
+ - Speeduped with wasm
+ - Liberated from electron to pure webbrowser
