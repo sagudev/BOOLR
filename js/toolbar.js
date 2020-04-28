@@ -25,7 +25,11 @@ toolbar.message = function(msg,type) {
     },3000);
 }
 
-// Input/Output list
+function toolbar_message(msg,type) {
+    toolbar.message(msg,type);
+}
+
+// Input/Output list (list of elements)
 const list = document.getElementById("list");
 list.show = function() {
     list.style.display = "block";
