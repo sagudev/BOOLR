@@ -1,7 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOOLR</title>
 
     <link rel="shortcut icon" type="image/png" href="static/img/favicon.png" />
@@ -28,10 +30,10 @@
             if (result !== 3)
                 throw new Error("wasm addition doesn't work!");
         }
-
         run();
         /* Export to global */
         window.add = add;
+        window.openFile = openFile;
     </script>
 
     <!-- Preload canvas fonts -->

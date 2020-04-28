@@ -1,23 +1,55 @@
 use wasm_bindgen::prelude::*;
-//mod audio; maybe is  beter to keep it in js,and its not cruical
+use wasm_bindgen::JsCast;
+use web_sys::Element;
+use web_sys::HtmlElement;
+//mod audio; //maybe is  beter to keep it in js,and its not cruical
 
-// Called when the wasm module is instantiated
-/* #[wasm_bindgen(start)]
+// from startup.js
+#[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
-    // Use `web_sys`'s global `window` function to get a handle on the global
-    // window object.
     let window = web_sys::window().expect("no global `window` exists");
     let document = window.document().expect("should have a document on window");
-    let body = document.body().expect("document should have a body");
+    /*
+    getLocalStorage(localStorage.pwsData);
+    getCustomComponents();
 
-    // Manufacture the element we're gonna append
-    let val = document.create_element("p")?;
-    val.set_inner_html("Hello from Rust!");
-
-    body.append_child(&val)?;
-
+    readSaveFiles();
+    updateDebugInfo();
+    setInterval(updateDebugInfo, 500);
+    draw();
+     */
+    document
+        .query_selector(".main-menu .loading")?
+        .expect("Where is .main-menu .loading")
+        .dyn_ref::<HtmlElement>()
+        .expect("#loading should be an `HtmlElement`")
+        .style()
+        .set_property("display", "none")?;
+    let buttons = document.query_selector_all(".main-menu > button")?;
+    for i in 0..buttons.length() {
+        let el = buttons
+            .item(i)
+            .expect("no item in buttons")
+            .dyn_ref::<HtmlElement>()
+            .expect("#loading should be an `HtmlElement`")
+            .style();
+        el.set_property("top", "0")?;
+        el.set_property("opacity", "1")?;
+        el.set_property("transform", "translateX(0px)")?;
+        buttons
+            .item(i)
+            .expect("no item in buttons")
+            .dyn_ref::<Element>()
+            .expect("#loading should be an `Element`")
+            .query_selector(".material-icons")?
+            .expect("not these")
+            .dyn_ref::<HtmlElement>()
+            .expect("#loading should be an `HtmlElement`")
+            .style()
+            .set_property("transform", "translateX(0px)")?;
+    }
     Ok(())
-} */
+}
 
 #[wasm_bindgen]
 pub fn add(a: u32, b: u32) -> u32 {
