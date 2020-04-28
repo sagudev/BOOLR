@@ -1,7 +1,8 @@
 use wasm_bindgen::prelude::*;
+//mod audio; maybe is  beter to keep it in js,and its not cruical
 
 // Called when the wasm module is instantiated
-#[wasm_bindgen(start)]
+/* #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
     // Use `web_sys`'s global `window` function to get a handle on the global
     // window object.
@@ -16,7 +17,7 @@ pub fn main() -> Result<(), JsValue> {
     body.append_child(&val)?;
 
     Ok(())
-}
+} */
 
 #[wasm_bindgen]
 pub fn add(a: u32, b: u32) -> u32 {

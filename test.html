@@ -1,0 +1,27 @@
+<html>
+
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+</head>
+
+<body>
+  <p id="demo">JavaScript can change HTML content.</p>
+  <script type="module">
+    import init, { add } from './pkg/BOOLR.js';
+    async function run() {
+      await init();
+      // And afterwards we can use all the functionality defined in wasm.
+      const result = add(1, 2);
+      console.log(`1 + 2 = ${result}`);
+      if (result !== 3)
+        throw new Error("wasm addition doesn't work!");
+    }
+
+    run();
+    /* Export to global */
+    window.add = add;
+  </script>
+  <button type="button" onclick='document.getElementById("demo").innerHTML = "1 + 2 = " + add(1, 2)'>Click Me!</button>
+</body>
+
+</html>
