@@ -7,7 +7,9 @@ use wasm_bindgen::JsCast;
 use web_sys::Element;
 use web_sys::HtmlElement;
 
+mod components;
 mod audio; //it could stay in js
+mod canvas;
 mod localstorage;
 mod saved_custom_components;
 mod toolbar;
@@ -17,6 +19,7 @@ mod toolbar;
 pub fn main() -> Result<(), JsValue> {
     let window = web_sys::window().expect("no global `window` exists");
     let document = window.document().expect("should have a document on window");
+    canvas::init()?;
     /*
     getLocalStorage(localStorage.pwsData);
     getCustomComponents();
@@ -25,7 +28,7 @@ pub fn main() -> Result<(), JsValue> {
     updateDebugInfo();
     setInterval(updateDebugInfo, 500);
     draw();
-     */
+    */
     document
         .query_selector(".main-menu .loading")?
         .expect("Where is .main-menu .loading")

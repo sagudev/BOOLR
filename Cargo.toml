@@ -29,4 +29,10 @@ features = [
   'Node',
   'CssStyleDeclaration',
   'NodeList',
+  # canvas
+  'CanvasRenderingContext2d',
+  'EventTarget',
+  'HtmlCanvasElement',
+  'MouseEvent',
+  'ContextAttributes2d',
 ]

@@ -345,11 +345,19 @@
                 document.querySelector("#menuopen .container").style.transform = "rotateZ(180deg)";
             }
 
+            function menu_show() {
+                menu.show()
+            }
+
             menu.hide = function () {
                 this.style.opacity = 0;
                 this.style.bottom = -this.clientHeight - 100;
 
                 document.querySelector("#menuopen .container").style.transform = "rotateZ(0deg)";
+            }
+
+            function menu_hide() {
+                menu.hide()
             }
         </script>
     </ul>

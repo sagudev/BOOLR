@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
+/* use wasm_bindgen::JsCast;
 use web_sys::OscillatorType;
 
 #[wasm_bindgen]
@@ -22,4 +22,9 @@ pub fn beep(frequency: Option<f32>, duration: Option<i32>) -> Result<(), JsValue
     )?;
     closure.forget();
     Ok(())
+} */
+
+#[wasm_bindgen]
+extern "C" {
+    pub fn beep(frequency: Option<f32>, duration: Option<i32>);
 }
