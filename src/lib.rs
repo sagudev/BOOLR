@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 extern crate js_sys;
 extern crate wasm_bindgen;
 extern crate web_sys;
@@ -8,8 +9,8 @@ use web_sys::Element;
 use web_sys::HtmlElement;
 
 mod audio; //it could stay in js
-mod components;
 mod canvas;
+mod components;
 mod localstorage;
 mod saved_custom_components;
 mod toolbar;

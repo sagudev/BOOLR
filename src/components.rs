@@ -367,7 +367,7 @@ impl Component {
     }
     pub fn rotate(&mut self) {
         self.rotation = {
-            match self.rotation.clone() {
+            match self.rotation {
                 Rotation::R0 => Rotation::R1,
                 Rotation::R1 => Rotation::R2,
                 Rotation::R2 => Rotation::R3,
@@ -432,15 +432,10 @@ impl Component {
                 if self.prop.rom.is_some() {
                     let content = self.prop.rom.as_ref().unwrap()[addr];
                     for i in 0..self.output.len() {
-                        self.output[i].value = if (content & (1 << i)) > 0 {
-                            true
-                        } else {
-                            false
-                        };
+                        self.output[i].value = (content & (1 << i)) > 0;
                     }
                 }
-            }
-            // !do not add wildcard here, rather use empty implementation
+            } // !do not add wildcard here, rather use empty implementation
         }
     }
 }

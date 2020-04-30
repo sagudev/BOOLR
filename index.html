@@ -21,7 +21,11 @@
     <!-- <script src="js/saves.js"></script>
         <script src="js/savedCustomComponents.js"></script> -->
     <script type="module">
-        import init, { add } from './pkg/BOOLR.js';
+        //if(window.location.href.indexOf("github") > -1) {
+        //    import init from './stable/BOOLR.js';
+        //} else {
+        //}
+        import init from './pkg/BOOLR.js';
         async function run() {
             await init();
             // And afterwards we can use all the functionality defined in wasm.

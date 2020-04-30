@@ -10,8 +10,8 @@ pub fn toolbar_message(msg: String, is_warning: bool) -> Result<(), JsValue> {
     let window = web_sys::window().expect("no global `window` exists");
     let document = window.document().expect("should have a document on window");
     unsafe {
-        if let Some(foo) = HIDE_TOOLBAR_MESSAGE {
-            window.clear_timeout_with_handle(foo);
+        if let Some(htm) = HIDE_TOOLBAR_MESSAGE {
+            window.clear_timeout_with_handle(htm);
         }
     }
     let toast = document

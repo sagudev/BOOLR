@@ -1,6 +1,5 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
 
 #[wasm_bindgen]
 extern "C" {
