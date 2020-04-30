@@ -83,7 +83,8 @@ pub struct ElementDefault {
 /// Elements that are avabile.
 /// When you add new element you will see errors (because match will ensure that all possible cases are being handled so no wildcard (_) in element match),
 /// where you need to add implementation.
-pub enum Element {
+/// rename to Element when https://github.com/rustwasm/wasm-bindgen/issues/1807 is solved
+pub enum Elements {
     Input,
     Output,
     NOT,
@@ -105,12 +106,12 @@ pub enum Element {
     ROM,
 }
 
-impl Element {
+impl Elements {
     /// get default data for element
     /// returns ((width, height), (input, output)
     pub fn get_default_data(self) -> ElementDefault {
         match self {
-            Element::Input => ElementDefault {
+            Elements::Input => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [].to_vec(),
@@ -120,7 +121,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Output => ElementDefault {
+            Elements::Output => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -130,7 +131,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::NOT => ElementDefault {
+            Elements::NOT => ElementDefault {
                 width: 1,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -141,7 +142,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::AND => ElementDefault {
+            Elements::AND => ElementDefault {
                 width: 2,
                 height: 2,
                 input: [Pin::new(Side::S3, 0), Pin::new(Side::S3, 1)].to_vec(),
@@ -152,7 +153,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::OR => ElementDefault {
+            Elements::OR => ElementDefault {
                 width: 2,
                 height: 2,
                 input: [Pin::new(Side::S3, 0), Pin::new(Side::S3, 1)].to_vec(),
@@ -163,7 +164,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::XOR => ElementDefault {
+            Elements::XOR => ElementDefault {
                 width: 2,
                 height: 2,
                 input: [Pin::new(Side::S3, 0), Pin::new(Side::S3, 1)].to_vec(),
@@ -174,7 +175,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Button => ElementDefault {
+            Elements::Button => ElementDefault {
                 width: 2,
                 height: 2,
                 input: [Pin::new(Side::S3, 0), Pin::new(Side::S3, 1)].to_vec(),
@@ -185,7 +186,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Constant => ElementDefault {
+            Elements::Constant => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [].to_vec(),
@@ -195,7 +196,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Delay => ElementDefault {
+            Elements::Delay => ElementDefault {
                 // dialog (read the source l2067)
                 width: 2,
                 height: 1,
@@ -207,7 +208,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Clock => ElementDefault {
+            Elements::Clock => ElementDefault {
                 // dialog (read the source l2303)
                 width: 2,
                 height: 1,
@@ -219,7 +220,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Debug => ElementDefault {
+            Elements::Debug => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -230,7 +231,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Beep => ElementDefault {
+            Elements::Beep => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -243,7 +244,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Counter => ElementDefault {
+            Elements::Counter => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -253,7 +254,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::LED => ElementDefault {
+            Elements::LED => ElementDefault {
                 width: 1,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -263,7 +264,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::Display => ElementDefault {
+            Elements::Display => ElementDefault {
                 width: 4,
                 height: 5,
                 input: [
@@ -283,7 +284,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            /* Element::Custom => ElementDefault {
+            /* Elements::Custom => ElementDefault {
                 width: 3,
                 height: 1,
                 input: [].to_vec(),
@@ -293,7 +294,7 @@ impl Element {
                     ..Default::default()
                 },
             }, */
-            Element::TimerStart => ElementDefault {
+            Elements::TimerStart => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [].to_vec(),
@@ -303,7 +304,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::TimerEnd => ElementDefault {
+            Elements::TimerEnd => ElementDefault {
                 width: 2,
                 height: 1,
                 input: [Pin::new(Side::S3, 0)].to_vec(),
@@ -313,7 +314,7 @@ impl Element {
                     ..Default::default()
                 },
             },
-            Element::ROM => ElementDefault {
+            Elements::ROM => ElementDefault {
                 // dialog (l2951)
                 width: 3,
                 height: 8,
@@ -337,7 +338,7 @@ impl Element {
 /// Component on screen
 pub struct Component {
     pub name: String,
-    pub base: Element,
+    pub base: Elements,
     pub pos: (i32, i32),
     pub width: u32,
     pub height: u32,
@@ -349,7 +350,7 @@ pub struct Component {
 }
 
 impl Component {
-    pub fn new(name: String, base: Element, pos: (i32, i32)) -> Self {
+    pub fn new(name: String, base: Elements, pos: (i32, i32)) -> Self {
         let default = base.get_default_data();
         Self {
             name,
@@ -389,41 +390,41 @@ impl Component {
         assert_eq!(b0 as usize, u0);
         */
         match self.base {
-            Element::Input => self.output[0].value = self.value != 0,
-            Element::Output => self.value = self.input[0].value as usize,
-            Element::NOT => self.output[0].value = !self.input[0].value,
-            Element::AND => self.output[0].value = self.input[0].value && self.input[1].value,
-            Element::OR => self.output[0].value = self.input[0].value || self.input[1].value,
-            Element::XOR => self.output[0].value = self.input[0].value ^ self.input[1].value,
-            Element::Button => self.output[0].value = self.value != 0,
-            Element::Constant => self.output[0].value = self.value != 0,
-            Element::Delay => { /* No implementation */ }
-            Element::Clock => self.output[0].value = self.value != 0,
-            Element::Debug => {
+            Elements::Input => self.output[0].value = self.value != 0,
+            Elements::Output => self.value = self.input[0].value as usize,
+            Elements::NOT => self.output[0].value = !self.input[0].value,
+            Elements::AND => self.output[0].value = self.input[0].value && self.input[1].value,
+            Elements::OR => self.output[0].value = self.input[0].value || self.input[1].value,
+            Elements::XOR => self.output[0].value = self.input[0].value ^ self.input[1].value,
+            Elements::Button => self.output[0].value = self.value != 0,
+            Elements::Constant => self.output[0].value = self.value != 0,
+            Elements::Delay => { /* No implementation */ }
+            Elements::Clock => self.output[0].value = self.value != 0,
+            Elements::Debug => {
                 self.input[0].value = self.value != 0;
                 /* notifications.push(format!("{}: {}", self.name, self.value));
                 boolrConsole.log(format!("{}: {}", self.name, self.value)); */
             }
-            Element::Beep => {
+            Elements::Beep => {
                 if self.input[0].value {
                     beep(self.prop.frequency, self.prop.duration);
                 }
             }
-            Element::Counter => {
+            Elements::Counter => {
                 if self.input[0].value {
                     self.value += 1;
                 }
             }
-            Element::LED => self.value = self.input[0].value as usize,
-            Element::Display => { /* No implementation */ }
-            /* Element::Custom => { // l3114
+            Elements::LED => self.value = self.input[0].value as usize,
+            Elements::Display => { /* No implementation */ }
+            /* Elements::Custom => { // l3114
                 for input in self.input {
 
                 }
             }, */
-            Element::TimerStart => self.output[0].value = self.value != 0,
-            Element::TimerEnd => self.value = self.input[0].value as usize,
-            Element::ROM => {
+            Elements::TimerStart => self.output[0].value = self.value != 0,
+            Elements::TimerEnd => self.value = self.input[0].value as usize,
+            Elements::ROM => {
                 let mut addr = 0;
                 for i in 0..self.input.len() {
                     addr |= (self.input[i].value as usize) << i; // is whole rom impl right? l2960
