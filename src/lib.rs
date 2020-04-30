@@ -7,8 +7,8 @@ use wasm_bindgen::JsCast;
 use web_sys::Element;
 use web_sys::HtmlElement;
 
-mod components;
 mod audio; //it could stay in js
+mod components;
 mod canvas;
 mod localstorage;
 mod saved_custom_components;

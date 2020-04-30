@@ -1,3 +1,5 @@
+use crate::audio::beep;
+use wasm_bindgen::prelude::*;
 #[derive(Clone, Copy, Debug)]
 /// All rotation
 pub enum Rotation {
@@ -59,7 +61,7 @@ pub struct Properties {
     frequency: Option<f32>,
     duration: Option<i32>,
     delay: Option<i32>,
-    data: Option<Vec<usize>>,
+    rom: Option<Vec<usize>>,
     address_width: Option<i32>,
     data_width: Option<i32>,
     description: Option<String>,
@@ -76,8 +78,11 @@ pub struct ElementDefault {
     prop: Properties,
 }
 
+#[wasm_bindgen]
 #[derive(Clone, Copy, Debug)]
-/// Elements that are avabile
+/// Elements that are avabile.
+/// When you add new element you will see errors (because match will ensure that all possible cases are being handled so no wildcard (_) in element match),
+/// where you need to add implementation.
 pub enum Element {
     Input,
     Output,
@@ -320,14 +325,17 @@ impl Element {
                     ..Default::default()
                 },
             },
+            // !do not add wildcard here
         }
     }
+    /* pub fn rustfy(component: String) -> Self {
+        component.to_lowercase();
+    } */
 }
 
 #[derive(Clone, Debug)]
 /// Component on screen
 pub struct Component {
-    // add value usize
     pub name: String,
     pub base: Element,
     pub pos: (i32, i32),
@@ -336,6 +344,8 @@ pub struct Component {
     pub input: Vec<Pin>,
     pub output: Vec<Pin>,
     pub rotation: Rotation,
+    pub value: usize,
+    pub prop: Properties,
 }
 
 impl Component {
@@ -350,6 +360,8 @@ impl Component {
             input: default.input,
             output: default.output,
             rotation: Rotation::R0,
+            value: 0,
+            prop: default.prop,
         }
     }
     pub fn rotate(&mut self) {
@@ -362,5 +374,72 @@ impl Component {
             }
         }
     }
-    pub fn draw(&self) {}
+    /// How to draw
+    pub fn draw(&mut self) {}
+    /// Calculate output pin
+    pub fn function(&mut self) {
+        /*
+        let u1: usize = 1;
+        let u0: usize = 0;
+        assert_eq!(true, u1 != 0);
+        assert_eq!(false, u0 != 0);
+        let b1: bool = true;
+        let b0: bool = false;
+        assert_eq!(b1 as usize, u1);
+        assert_eq!(b0 as usize, u0);
+        */
+        match self.base {
+            Element::Input => self.output[0].value = self.value != 0,
+            Element::Output => self.value = self.input[0].value as usize,
+            Element::NOT => self.output[0].value = !self.input[0].value,
+            Element::AND => self.output[0].value = self.input[0].value && self.input[1].value,
+            Element::OR => self.output[0].value = self.input[0].value || self.input[1].value,
+            Element::XOR => self.output[0].value = self.input[0].value ^ self.input[1].value,
+            Element::Button => self.output[0].value = self.value != 0,
+            Element::Constant => self.output[0].value = self.value != 0,
+            Element::Delay => { /* No implementation */ }
+            Element::Clock => self.output[0].value = self.value != 0,
+            Element::Debug => {
+                self.input[0].value = self.value != 0;
+                /* notifications.push(format!("{}: {}", self.name, self.value));
+                boolrConsole.log(format!("{}: {}", self.name, self.value)); */
+            }
+            Element::Beep => {
+                if self.input[0].value {
+                    beep(self.prop.frequency, self.prop.duration);
+                }
+            }
+            Element::Counter => {
+                if self.input[0].value {
+                    self.value += 1;
+                }
+            }
+            Element::LED => self.value = self.input[0].value as usize,
+            Element::Display => { /* No implementation */ }
+            /* Element::Custom => { // l3114
+                for input in self.input {
+
+                }
+            }, */
+            Element::TimerStart => self.output[0].value = self.value != 0,
+            Element::TimerEnd => self.value = self.input[0].value as usize,
+            Element::ROM => {
+                let mut addr = 0;
+                for i in 0..self.input.len() {
+                    addr |= (self.input[i].value as usize) << i; // is whole rom impl right? l2960
+                }
+                if self.prop.rom.is_some() {
+                    let content = self.prop.rom.as_ref().unwrap()[addr];
+                    for i in 0..self.output.len() {
+                        self.output[i].value = if (content & (1 << i)) > 0 {
+                            true
+                        } else {
+                            false
+                        };
+                    }
+                }
+            }
+            // !do not add wildcard here, rather use empty implementation
+        }
+    }
 }
