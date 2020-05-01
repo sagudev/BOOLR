@@ -150,22 +150,49 @@ impl Dialog {
             .expect("Where is my canvas?")
             .dyn_into::<web_sys::HtmlCanvasElement>()
             .unwrap()
-            .focus().unwrap();
+            .focus()
+            .unwrap();
     }
     pub fn add_option(&self, text: String, onclick: &js_sys::Function) {
         let window = web_sys::window().expect("no global `window` exists");
         let document = window.document().expect("should have a document on window");
-        let button = document.create_element("button").unwrap().dyn_into::<web_sys::HtmlElement>().unwrap();
+        let button = document
+            .create_element("button")
+            .unwrap()
+            .dyn_into::<web_sys::HtmlElement>()
+            .unwrap();
         button.set_inner_html(&text);
         button.set_onmousedown(Some(onclick));
-        let closure: Closure<dyn FnMut(_)> = Closure::wrap(Box::new(
-            |_: String| {
-                Dialog::get().hide();
-            },
-        ));       
+        let closure: Closure<dyn FnMut(_)> = Closure::wrap(Box::new(|_: String| {
+            Dialog::get().hide();
+        }));
         button.set_onmouseup(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
         self.options.append_child(&button).unwrap();
     }
-    
+    pub fn init(&self) {
+        let closure = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
+            if event.key() == "Enter" {
+                Dialog::get()
+                    .options
+                    .children()
+                    .item(Dialog::get().options.children().length() - 1)
+                    .unwrap()
+                    .dyn_ref::<HtmlElement>()
+                    .expect("#overlay should be an `HtmlElement`")
+                    .onmousedown()
+                    .unwrap()
+                    .call0(&wasm_bindgen::JsValue::NULL)
+                    .unwrap();
+            } else if event.key() == "Escape" {
+                Dialog::get().hide();
+            }
+        }) as Box<dyn FnMut(_)>);
+        self.dialog
+            .clone()
+            .dyn_into::<web_sys::HtmlElement>()
+            .unwrap()
+            .set_onkeydown(Some(closure.as_ref().unchecked_ref()));
+        closure.forget();
+    }
 }
