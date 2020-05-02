@@ -59,7 +59,7 @@ dialog.onkeydown = function(e) {
     }
 }
 
-dialog.welcome = function(component) {
+dialog.welcome = function() {
     dialog.show();
     dialog.name.innerHTML = "Welcome";
 
@@ -133,7 +133,7 @@ dialog.editBoard = function(save) {
     });
 }
 
-dialog.update = function(component) {
+dialog.update = function() {
     dialog.show();
     dialog.name.innerHTML = "Update " + VERSION;
 

@@ -1,11 +1,27 @@
+use js_sys::Function;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = dialog)]
-    fn show();
+    pub fn show();
     #[wasm_bindgen(js_namespace = dialog)]
-    fn hide();
+    pub fn hide();
+    #[wasm_bindgen(js_namespace = dialog, js_name=addOption)]
+    pub fn add_option(text: String, onclick: Function);
+    #[wasm_bindgen(js_namespace = dialog)]
+    pub fn welcome();
+    #[wasm_bindgen(js_namespace = dialog, js_name=createBoard)]
+    pub fn create_board(); // createSaveFile
+    #[wasm_bindgen(js_namespace = dialog, js_name=editBoard)]
+    pub fn edit_board(); // nodes fs.writeFile, so it must call my new wasm function
+                         // red more on l116
+    #[wasm_bindgen(js_namespace = dialog)]
+    pub fn update();
+    #[wasm_bindgen(js_namespace = dialog, js_name=openBoard)]
+    pub fn open_board();
+    #[wasm_bindgen(js_namespace = dialog, js_name=connectToServer )]
+    pub fn connect2server(); // l185
 }
 /* struct Dialog {
     dialog: web_sys::Element,
