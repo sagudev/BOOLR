@@ -5,7 +5,21 @@
 </head>
 
 <body>
+  <div id="dialog">diag<h1>name</h1></div>
   <p id="demo">JavaScript can change HTML content.</p>
+  <script>
+    function get_dialog() {
+      return dialog;
+    }
+    const dialog = document.getElementById("dialog");
+    dialog.name = document.querySelector("#dialog h1");
+    dialog.show = function () {
+      this.name.innerHTML="hiiiiiiiiiiiiiiiiiiiii"
+    }
+    dialog.hide = function () {
+      this.name.innerHTML=""
+    }
+  </script>
   <script type="module">
     import init, { add } from './pkg/BOOLR.js';
     async function run() {
@@ -22,7 +36,6 @@
     window.add = add;
   </script>
   <button type="button" onclick='document.getElementById("demo").innerHTML = "1 + 2 = " + add(1, 2)'>Click Me!</button>
-  <script>console.log("2 + 3 = " + add(2, 3));</script>
 </body>
 
 </html>
