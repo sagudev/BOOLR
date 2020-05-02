@@ -42,6 +42,9 @@
     <!-- Preload canvas fonts -->
     <div id="preload" style="font-family: Monospaced; position: absolute; top: -20px;">&nbsp;</div>
 
+    <!-- Version number -->
+    <script>const VERSION = "2.0.0"</script>
+
     <canvas id="canvas" tabindex="1"></canvas>
 
     <!-- Main menu -->
@@ -127,7 +130,7 @@
             <div>
                 <p>Now it's time to introduce you to logic gates.</p>
                 <p>See the I/O button on the toolbar? Click it and select 'Input'.</p>
-                <img src="img/tutorial/0.png">
+                <img src="static/img/tutorial/0.png">
                 <p>Now you have selected the input gate. To place it on the board, simply click somewhere with the left
                     mouse button.</p>
                 <p>Click the input gate to toggle its value.</p>
@@ -140,7 +143,7 @@
                 <p>Select the NOT gate (!) on the toolbar and give it a nice place on the board.</p>
                 <p>Click the <i>output port</i> (black) of our input gate and move the mouse while holding the left
                     mouse button to the <i>input port</i> (white) of our NOT gate.</p>
-                <img src="img/tutorial/1.png">
+                <img src="static/img/tutorial/1.png">
                 <p>Now the input gate is connected with the NOT gate and the NOT gate will invert the value of the input
                     gate.</p>
                 <p>Tip: You can right click on a gate on the toolbar to see the truth table of that gate.</p>
@@ -150,7 +153,7 @@
                     with an output gate.</p>
                 <p>Select the output gate from the input/output list (I/O) on the toolbar and place it on the board.</p>
                 <p>Now, connect the NOT gate with it the same way we connected the input gate with the NOT gate</p>
-                <img src="img/tutorial/2.png">
+                <img src="static/img/tutorial/2.png">
                 <p>Congratulations! You have built your first circuit!</p>
                 <p>Tip: to view the connections of a gate, right click it and click 'View connections'</p>
             </div>
@@ -159,7 +162,7 @@
                 <p>To do this, we need to select it. Hold shift and and drag the mouse while holding the left mouse
                     button to select the circuit.
                     Make sure every logic gate of your circuit is inside the selection box</p>
-                <img src="img/tutorial/3.png">
+                <img src="static/img/tutorial/3.png">
                 <p>When you have selected your circuit, a menu pops up. Click 'Copy' or hit Ctrl+C.</p>
                 <p>To paste the circuit, right click somewhere on the board and click 'Paste' or hit Ctrl+V</p>
                 <p>Moving a selection around works the same way as moving gates, drag it around with Ctrl+click and
@@ -171,7 +174,7 @@
                     you. </p>
                 <p>The 'componentize function' puts your circuit in a compact, nice little box. The input gates of your
                     circuit are going to be its input ports, the output gates its output ports</p>
-                <img src="img/tutorial/4.png">
+                <img src="static/img/tutorial/4.png">
                 <p>To do this, select your circuit like the previous section and click 'Componentize'.</p>
                 <p>Double click your <i>custom component</i> to open it en view your circuit in its original state.</p>
             </div>
@@ -179,7 +182,7 @@
                 <p>Press shift+T to open the console. You can use the command 'help' or '?' to see a list of available
                     commands.</p>
                 <p>Use the arrow up and down key to navigate through earlier executed commands.</p>
-                <img src="img/tutorial/6.png">
+                <img src="static/img/tutorial/6.png">
                 <p>Press Ctrl+L to clear the console.</p>
                 <p>Use the tab key to autocomplete command names.</p>
                 <p>In commands that require a position as argument, you can use '~' for positions relative to the mouse
@@ -188,7 +191,7 @@
             <div>
                 <p>You can use the console to declare variables. For components with a specific numeric property like
                     'delay' on a clock, you can use that variable.</p>
-                <img src="img/tutorial/7.png">
+                <img src="static/img/tutorial/7.png">
                 <p>Usage: <code>'set example 200'</code> and <code>'get example'</code>. To use variables for
                     components, enter for example <code>'2 * example - 50'</code> in the <i>edit</i> menu.
                     When you change the value of a variable by executing 'set example 500', the values of the components

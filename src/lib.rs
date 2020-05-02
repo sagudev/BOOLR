@@ -7,13 +7,13 @@ use web_sys::HtmlElement;
 mod utils;
 use crate::utils::set_panic_hook;
 
-/* mod audio;
+mod audio;
 mod dialog;
 mod canvas;
 mod components;
 mod localstorage;
 mod saved_custom_components;
-mod toolbar; */
+mod toolbar;
 
 // from startup.js
 #[wasm_bindgen(start)]
@@ -21,16 +21,6 @@ pub fn main() -> Result<(), JsValue> {
     set_panic_hook();
     let window = web_sys::window().expect("no global `window` exists");
     let document = window.document().expect("should have a document on window");
-    hide();
-    let closure = Closure::wrap(Box::new(move || {
-        show();
-    }) as Box<dyn Fn()>);
-    window.set_timeout_with_callback_and_timeout_and_arguments_0(
-        closure.as_ref().unchecked_ref(),
-        1000,
-    )?;
-    closure.forget();
-    return Ok(());
     //canvas::init()?;
     /*
     getLocalStorage(localStorage.pwsData);
@@ -81,14 +71,6 @@ pub fn add(a: u32, b: u32) -> u32 {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = dialog)]
-    fn show();
-    #[wasm_bindgen(js_namespace = dialog)]
-    fn hide();
-}
-
-#[wasm_bindgen]
-extern "C" {
     #[wasm_bindgen(js_namespace = console)]
-    fn log(_: String);
+    fn log(msg: String);
 }

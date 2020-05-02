@@ -1,8 +1,13 @@
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
 
-struct Dialog {
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = dialog)]
+    fn show();
+    #[wasm_bindgen(js_namespace = dialog)]
+    fn hide();
+}
+/* struct Dialog {
     dialog: web_sys::Element,
     overlay: web_sys::Element,
     name: web_sys::Element,
@@ -195,4 +200,4 @@ impl Dialog {
             .set_onkeydown(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
-}
+} */
