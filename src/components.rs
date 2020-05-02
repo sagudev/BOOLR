@@ -1,4 +1,5 @@
 use crate::audio::beep;
+use std::str::FromStr;
 use wasm_bindgen::prelude::*;
 #[derive(Clone, Copy, Debug)]
 /// All rotation
@@ -82,7 +83,7 @@ pub struct ElementDefault {
 #[derive(Clone, Copy, Debug)]
 /// Elemento that are avabile.
 /// When you add new element you will see errors (because match will ensure that all possible cases are being handled so no wildcard (_) in element match),
-/// where you need to add implementation.
+/// where you need to add implementation. (Note: look fromstr!!!)
 /// rename to Element when https://github.com/rustwasm/wasm-bindgen/issues/1807 is solved
 pub enum Elemento {
     Input,
@@ -104,6 +105,41 @@ pub enum Elemento {
     TimerStart,
     TimerEnd,
     ROM,
+}
+
+impl FromStr for Elemento {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Elemento, String> {
+        match s {
+            "input" => Ok(Elemento::Input),
+            "output" => Ok(Elemento::Output),
+            "not" => Ok(Elemento::NOT),
+            "and" => Ok(Elemento::AND),
+            "or" => Ok(Elemento::OR),
+            "xor" => Ok(Elemento::XOR),
+            "button" => Ok(Elemento::Button),
+            "constant" => Ok(Elemento::Constant),
+            "delay" => Ok(Elemento::Delay),
+            "clock" => Ok(Elemento::Clock),
+            "debug" => Ok(Elemento::Debug),
+            "beep" => Ok(Elemento::Beep),
+            "counter" => Ok(Elemento::Counter),
+            "led" => Ok(Elemento::LED),
+            "display" => Ok(Elemento::Display),
+            //"custom" => Ok(Elemento::Custom),
+            "timerstart" => Ok(Elemento::TimerStart),
+            "timerend" => Ok(Elemento::TimerEnd),
+            "rom" => Ok(Elemento::ROM),
+            _ => Err(format!("Not found elemento: {}", s)),
+        }
+    }
+}
+
+#[wasm_bindgen]
+impl Elemento {
+    pub fn rustfy(component: String) -> Self {
+        component.to_lowercase().parse::<Elemento>().unwrap()
+    }
 }
 
 impl Elemento {
@@ -329,9 +365,6 @@ impl Elemento {
             // !do not add wildcard here
         }
     }
-    /* pub fn rustfy(component: String) -> Self {
-        component.to_lowercase();
-    } */
 }
 
 #[derive(Clone, Debug)]
