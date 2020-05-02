@@ -8,9 +8,9 @@ mod utils;
 use crate::utils::set_panic_hook;
 
 mod audio;
-mod dialog;
 mod canvas;
 mod components;
+mod dialog;
 mod localstorage;
 mod saved_custom_components;
 mod toolbar;
