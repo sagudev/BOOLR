@@ -107,7 +107,7 @@ pub enum Elemento {
     ROM,
 }
 
-impl FromStr for Elemento {
+/* impl FromStr for Elemento {
     type Err = String;
     fn from_str(s: &str) -> Result<Elemento, String> {
         match s {
@@ -140,7 +140,7 @@ impl Elemento {
     pub fn rustfy(component: String) -> Self {
         component.to_lowercase().parse::<Elemento>().unwrap()
     }
-}
+} */
 
 impl Elemento {
     /// get default data for element
