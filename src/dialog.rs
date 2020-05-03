@@ -22,7 +22,22 @@ extern "C" {
     pub fn open_board();
     #[wasm_bindgen(js_namespace = dialog, js_name=connectToServer )]
     pub fn connect2server(); // l185
+    #[wasm_bindgen(js_namespace = dialog)]
+    pub fn settings(); // uses localstorage
+    #[wasm_bindgen(js_namespace = dialog)]
+    pub fn confirm(text: String, callback: Function);
+    #[wasm_bindgen(js_namespace = dialog)]
+    pub fn warning(text: String);
+    #[wasm_bindgen(js_namespace = dialog, js_name=localStorageError)]
+    pub fn local_storage_error();
 }
+
+/* Only functions that are tied to wasm are rewriten here */
+
+// l200
+pub fn connections(component: String) {}
+// l250
+pub fn truth_table(component: String) {}
 /* struct Dialog {
     dialog: web_sys::Element,
     overlay: web_sys::Element,

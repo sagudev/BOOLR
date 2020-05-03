@@ -300,7 +300,7 @@ dialog.truthTable = function(type) {
     dialog.addOption("Close");
 }
 
-dialog.settings = function(component) {
+dialog.settings = function() {
     dialog.show();
     dialog.name.innerHTML = "Settings";
 
