@@ -69,8 +69,23 @@ pub fn add(a: u32, b: u32) -> u32 {
     a + b
 }
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(msg: String);
+mod console {
+    use wasm_bindgen::prelude::wasm_bindgen;
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_namespace = console)]
+        fn log(msg: String);
+        #[wasm_bindgen(js_namespace = console)]
+        fn warn(msg: String);
+    }
+    macro_rules! console_log {
+        // Note that this is using the `log` function imported above during
+        // `bare_bones`
+        ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+    }
+    macro_rules! console_warn {
+        // Note that this is using the `log` function imported above during
+        // `bare_bones`
+        ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+    }
 }

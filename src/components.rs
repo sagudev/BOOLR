@@ -1,6 +1,67 @@
 use crate::audio::beep;
-use std::str::FromStr;
 use wasm_bindgen::prelude::*;
+
+pub struct Global {
+    pub components: Vec<Component>,
+    pub wires: Vec<Wire>,
+    /// When for example a custom component inside a custom component is opened, the path of custom components is saved in the following array
+    pub path: Vec<String>,
+}
+
+/// functions
+impl Global {
+    /// Adds component to the board
+    pub fn add(
+        &mut self,
+        component: Component,
+        pos: Option<(i64, i64)>,
+        force: Option<bool>,
+        undoable: Option<bool>,
+    ) -> bool {
+        if let Some(pos) = pos {
+            let x = pos.0;
+            let y = pos.1;
+        } else {
+            let x = component.pos.0;
+            let y = component.pos.1;
+        }
+        let force = {
+            if let Some(force) = force {
+                force
+            } else {
+                false
+            }
+        };
+        let undoable = {
+            if let Some(undoable) = undoable {
+                undoable
+            } else {
+                false
+            }
+        };
+        undoable
+    }
+}
+
+/// find functions
+impl Global {
+    pub fn find_component_by_pos(pos: Option<(i64, i64)>) {
+        if let Some(pos) = pos {
+            let x = pos.0;
+            let y = pos.1;
+        } else {
+        }
+    }
+}
+
+pub struct Wire {
+    pub from: Pin,
+    pub to: Pin,
+    pub color: (u32, u32, u32),
+    pub intersections: Vec<(usize, usize)>,
+    pub pos: Vec<(i64, i64)>,
+}
+
 #[derive(Clone, Copy, Debug)]
 /// All rotation
 pub enum Rotation {
@@ -20,7 +81,7 @@ pub enum Side {
 }
 
 #[derive(Clone, Copy, Debug)]
-/// Pin of component
+/// Pin (port) of component
 pub struct Pin {
     value: bool,
     side: Side,
@@ -107,7 +168,7 @@ pub enum Elemento {
     ROM,
 }
 
-/* impl FromStr for Elemento {
+/* impl std::str::FromStr for Elemento {
     type Err = String;
     fn from_str(s: &str) -> Result<Elemento, String> {
         match s {
@@ -372,7 +433,7 @@ impl Elemento {
 pub struct Component {
     pub name: String,
     pub base: Elemento,
-    pub pos: (i32, i32),
+    pub pos: (i64, i64),
     pub width: u32,
     pub height: u32,
     pub input: Vec<Pin>,
@@ -383,7 +444,7 @@ pub struct Component {
 }
 
 impl Component {
-    pub fn new(name: String, base: Elemento, pos: (i32, i32)) -> Self {
+    pub fn new(name: String, base: Elemento, pos: (i64, i64)) -> Self {
         let default = base.get_default_data();
         Self {
             name,
