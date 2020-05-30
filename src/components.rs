@@ -1,11 +1,33 @@
 use crate::audio::beep;
+use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 
+static mut ID: usize = 0;
+
+/// id schame
+/// max size 18_446_744_073_709_551_615
+pub fn generate_id() -> usize {
+    unsafe {
+        ID += 1;
+        ID - 1
+    }
+}
+
+#[derive(Clone, Debug, Copy)]
+pub struct Pos {
+    pub x: i64,
+    pub y: i64,
+}
+
+// Every wire has id, every component has id so
+// hasmap that has id for key is good
+// something like this: ID => Component
+// but for storaging it will probably be a problem.
 pub struct Global {
-    pub components: Vec<Component>,
-    pub wires: Vec<Wire>,
+    pub components: HashMap<usize, Component>,
+    pub wires: HashMap<usize, Wire>,
     /// When for example a custom component inside a custom component is opened, the path of custom components is saved in the following array
-    pub path: Vec<String>,
+    pub path: Vec<String>, // not known type
 }
 
 /// functions
@@ -14,16 +36,16 @@ impl Global {
     pub fn add(
         &mut self,
         component: Component,
-        pos: Option<(i64, i64)>,
+        pos: Option<Pos>,
         force: Option<bool>,
         undoable: Option<bool>,
     ) -> bool {
         if let Some(pos) = pos {
-            let x = pos.0;
-            let y = pos.1;
+            let x = pos.x;
+            let y = pos.y;
         } else {
-            let x = component.pos.0;
-            let y = component.pos.1;
+            let x = component.pos.x;
+            let y = component.pos.y;
         }
         let force = {
             if let Some(force) = force {
@@ -39,19 +61,74 @@ impl Global {
                 false
             }
         };
-        undoable
+        /*         if !findPortByPos(self, x, y) && !findWireByPos(self, x, y) || force {
+            self.components.push(component);
+            if(undoable && component.constructor == Custom && component.input.length + component.output.length == 0) {
+                component.open();
+            }
+            if(undoable) {
+                if(this != redoCaller) redoStack = [];
+                undoStack.push(() => {
+                    removeComponent(component);
+                    redoStack.push(add.bind(redoCaller,...arguments));
+                });
+            }
+            if(socket && sendToSocket) {
+                socket.send(JSON.stringify({
+                    type: "add",
+                    data: stringify([component])
+                }));
+            }
+            return true;
+        } */
+        return false;
     }
 }
 
 /// find functions
 impl Global {
-    pub fn find_component_by_pos(pos: Option<(i64, i64)>) {
-        if let Some(pos) = pos {
-            let x = pos.0;
-            let y = pos.1;
-        } else {
+    /// findComponentByPos:
+    /// Finds and returns component by position
+    /// If no component is found, it returns undefined
+    /// x = mouse.grid.x, y = mouse.grid.y
+    pub fn find_component_by_pos(&self, x: i64, y: i64) -> Option<Component> {
+        for (id, component) in &self.components {
+            if x >= component.pos.x
+                && x < component.pos.x + component.width as i64
+                && y <= component.pos.y
+                && y > component.pos.y - component.height as i64
+            {
+                return Some(component.clone());
+            }
+        }
+        None
+    }
+    // findPortByPos
+    // Finds and returns a port of a component by position
+    // If no port is found, it returns undefined
+    // x = mouse.grid.x, y = mouse.grid.y
+    /* pub fn find_port_by_pos(&self, x: i64, y: i64) -> Option<Component> {
+        if self.find_component_by_pos().is_none() { return None };
+    for i in 0..=4 {
+        const component = findComponentByPos(
+            x - Math.round(Math.sin(Math.PI / 2 * i)),
+            y - Math.round(Math.cos(Math.PI / 2 * i))
+        );
+
+        if(component) {
+            const side = i;
+            let pos;
+            if(side % 2 == 0) {
+                pos = x - component.pos.x;
+            }  else {
+                pos = component.pos.y - y;
+            }
+
+            const found = findPortByComponent(component,side,pos);
+            if(found) return found;
         }
     }
+    } */
 }
 
 pub struct Wire {
@@ -59,7 +136,7 @@ pub struct Wire {
     pub to: Pin,
     pub color: (u32, u32, u32),
     pub intersections: Vec<(usize, usize)>,
-    pub pos: Vec<(i64, i64)>,
+    pub pos: Vec<Pos>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -430,10 +507,11 @@ impl Elemento {
 
 #[derive(Clone, Debug)]
 /// Component on screen
+// even pins has id
 pub struct Component {
     pub name: String,
     pub base: Elemento,
-    pub pos: (i64, i64),
+    pub pos: Pos,
     pub width: u32,
     pub height: u32,
     pub input: Vec<Pin>,
@@ -444,7 +522,7 @@ pub struct Component {
 }
 
 impl Component {
-    pub fn new(name: String, base: Elemento, pos: (i64, i64)) -> Self {
+    pub fn new(name: String, base: Elemento, pos: Pos) -> Self {
         let default = base.get_default_data();
         Self {
             name,
