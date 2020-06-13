@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+#[macro_use]
+extern crate serde_derive;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::Element;

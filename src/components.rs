@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 
 static mut ID: usize = 0;
 
-/// id schame
+/// id only for component and wires
 /// max size 18_446_744_073_709_551_615
 pub fn generate_id() -> usize {
     unsafe {
@@ -13,12 +13,44 @@ pub fn generate_id() -> usize {
     }
 }
 
-#[derive(Clone, Debug, Copy)]
+/// id only for component and wires
+/// max size 18_446_744_073_709_551_615
+pub fn set_id(id: usize) {
+    unsafe {
+        ID = id;
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
+/// position
 pub struct Pos {
     pub x: i64,
     pub y: i64,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+/// All rotation
+pub enum Rotation {
+    R0,
+    R1,
+    R2,
+    R3,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+/// Sides of component
+pub enum Side {
+    S0,
+    S1,
+    S2,
+    S3,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+/// color
+pub struct Color(u32, u32, u32);
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 // Every wire has id, every component has id so
 // hasmap that has id for key is good
 // something like this: ID => Component
@@ -81,7 +113,7 @@ impl Global {
             }
             return true;
         } */
-        return false;
+        false
     }
 }
 
@@ -131,39 +163,22 @@ impl Global {
     } */
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Wire {
     pub from: Pin,
     pub to: Pin,
-    pub color: (u32, u32, u32),
+    pub color: Color,
     pub intersections: Vec<(usize, usize)>,
     pub pos: Vec<Pos>,
 }
 
-#[derive(Clone, Copy, Debug)]
-/// All rotation
-pub enum Rotation {
-    R0,
-    R1,
-    R2,
-    R3,
-}
-
-#[derive(Clone, Copy, Debug)]
-/// Sides of component
-pub enum Side {
-    S0,
-    S1,
-    S2,
-    S3,
-}
-
-#[derive(Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 /// Pin (port) of component
 pub struct Pin {
     value: bool,
     side: Side,
     pos: u32,
-    name: Option<&'static str>,
+    name: Option<String>,
 }
 
 impl Pin {
@@ -180,23 +195,23 @@ impl Pin {
             value: false,
             side,
             pos,
-            name: Some(name),
+            name: Some(name.to_string()),
         }
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum Type {
     Value,
     Char,
     Icon,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug)]
 /// Properties of component
 pub struct Properties {
     tip: Option<Type>,
-    text: Option<&'static str>,
+    text: Option<String>,
     frequency: Option<f32>,
     duration: Option<i32>,
     delay: Option<i32>,
@@ -206,7 +221,7 @@ pub struct Properties {
     description: Option<String>,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 /// ((width, height), (input, output), prop)
 /// ((u32, u32), (Vec<Pin>, Vec<Pin>), Properties)
 pub struct ElementDefault {
@@ -218,11 +233,13 @@ pub struct ElementDefault {
 }
 
 #[wasm_bindgen]
-#[derive(Clone, Copy, Debug)]
-/// Elemento that are avabile.
-/// When you add new element you will see errors (because match will ensure that all possible cases are being handled so no wildcard (_) in element match),
-/// where you need to add implementation. (Note: look fromstr!!!)
-/// rename to Element when https://github.com/rustwasm/wasm-bindgen/issues/1807 is solved
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+/// Elements that are available.
+// When you add new element you will see errors (because match will ensure
+//    that all possible cases are being handled so no wildcard (_) in
+//    element match), where you need to add implementation.
+//
+// rename to Element when https://github.com/rustwasm/wasm-bindgen/issues/1807 is solved
 pub enum Elemento {
     Input,
     Output,
@@ -312,7 +329,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Char),
-                    text: Some("!"),
+                    text: Some("!".to_string()),
                     ..Default::default()
                 },
             },
@@ -323,7 +340,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Char),
-                    text: Some("&"),
+                    text: Some("&".to_string()),
                     ..Default::default()
                 },
             },
@@ -334,7 +351,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Char),
-                    text: Some("|"),
+                    text: Some("|".to_string()),
                     ..Default::default()
                 },
             },
@@ -345,7 +362,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Char),
-                    text: Some("^"),
+                    text: Some("^".to_string()),
                     ..Default::default()
                 },
             },
@@ -356,7 +373,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Icon),
-                    text: Some("radio_button_checked"),
+                    text: Some("radio_button_checked".to_string()),
                     ..Default::default()
                 },
             },
@@ -378,7 +395,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Icon),
-                    text: Some("timer"),
+                    text: Some("timer".to_string()),
                     ..Default::default()
                 },
             },
@@ -390,7 +407,7 @@ impl Elemento {
                 output: [Pin::new(Side::S1, 0)].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Icon),
-                    text: Some("access_time"),
+                    text: Some("access_time".to_string()),
                     ..Default::default()
                 },
             },
@@ -401,7 +418,7 @@ impl Elemento {
                 output: [].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Icon),
-                    text: Some("report_problem"),
+                    text: Some("report_problem".to_string()),
                     ..Default::default()
                 },
             },
@@ -412,7 +429,7 @@ impl Elemento {
                 output: [].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Icon),
-                    text: Some("report_problem"),
+                    text: Some("report_problem".to_string()),
                     frequency: Some(700.0),
                     duration: Some(200),
                     ..Default::default()
@@ -496,7 +513,7 @@ impl Elemento {
                 output: [].to_vec(),
                 prop: Properties {
                     tip: Some(Type::Char),
-                    text: Some("ROM"),
+                    text: Some("ROM".to_string()),
                     ..Default::default()
                 },
             },
@@ -505,7 +522,7 @@ impl Elemento {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 /// Component on screen
 // even pins has id
 pub struct Component {

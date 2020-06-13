@@ -2,6 +2,9 @@
 name = "BOOLR"
 version = "0.1.0"
 authors = ["sagudev"]
+license = "GPL-3.0-or-later"
+repository = "https://github.com/sagudev/BOOLR"
+description = " A logic simulator"
 edition = "2018"
 
 [lib]
@@ -11,12 +14,17 @@ crate-type = ["cdylib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.63"
 js-sys = "0.3.40"
 console_error_panic_hook = { version = "0.1", optional = true }
+serde = "1.0"
+serde_derive = "1.0"
+
+[dependencies.wasm-bindgen]
+version = "0.2.63"
+features = ["serde-serialize"]
 
 [dependencies.web-sys]
-version = "0.3.40"
+version = "0.3"
 features = [
   # audio
   'AudioContext',
