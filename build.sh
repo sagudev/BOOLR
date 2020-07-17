@@ -3,7 +3,14 @@ set -e
 # Run format
 cargo fmt
 # Build
-wasm-pack build --target web
+case "$1" in
+    r*)
+        wasm-pack build --target web --release
+    ;;
+    *)
+        wasm-pack build --target web --dev
+    ;;
+esac
 # Server
 #python3 -m http.server
 # post-bindgen

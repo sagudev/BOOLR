@@ -72,26 +72,20 @@ impl Global {
         force: Option<bool>,
         undoable: Option<bool>,
     ) -> bool {
-        if let Some(pos) = pos {
-            let x = pos.x;
-            let y = pos.y;
+        let (x, y) = if let Some(pos) = pos {
+            (pos.x, pos.y)
         } else {
-            let x = component.pos.x;
-            let y = component.pos.y;
-        }
-        let force = {
-            if let Some(force) = force {
-                force
-            } else {
-                false
-            }
+            (component.pos.x, component.pos.y)
         };
-        let undoable = {
-            if let Some(undoable) = undoable {
-                undoable
-            } else {
-                false
-            }
+        let force = if let Some(force) = force {
+            force
+        } else {
+            false
+        };
+        let undoable = if let Some(undoable) = undoable {
+            undoable
+        } else {
+            false
         };
         /*         if !findPortByPos(self, x, y) && !findWireByPos(self, x, y) || force {
             self.components.push(component);
